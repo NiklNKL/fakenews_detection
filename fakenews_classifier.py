@@ -100,7 +100,7 @@ def get_bert_prediction(preprocessed_text):
     outputs = model(**inputs)
     # Get output probabilities by applying softmax
     probs = outputs[0].softmax(1).detach().cpu().numpy()[0]
-    return probs, changes
+    return probs
 
 # Preprocess input text and return the prediction
 def get_sklearn_prediction(model, processed_text):
