@@ -176,4 +176,4 @@ cython_debug/
 /results
 
 # models
-/fake-news-bert-base-uncased
+# /fake-news-bert-base-uncased
