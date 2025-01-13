@@ -1,8 +1,8 @@
 import streamlit as st
-import torch
+# import torch
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+# from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import numpy as np
 import re
 import contractions
@@ -24,11 +24,11 @@ st.set_page_config(layout="wide")
 model_folder = "models"
 model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load model and tokenizer from the local directory
-model = DistilBertForSequenceClassification.from_pretrained(model_path, torch_dtype=torch.float16).to(device)
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+# model = DistilBertForSequenceClassification.from_pretrained(model_path, torch_dtype=torch.float16).to(device)
+# tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 # Load pre-trained models
 log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
 naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
@@ -104,39 +104,39 @@ def preprocess_text_with_tracking(text):
 
     return processed_text, changes
 
-def get_bert_prediction(preprocessed_text, chunk_size=512, overlap=50):
-    # Tokenize the text with truncation and chunking
-    inputs = tokenizer(preprocessed_text, 
-                       return_tensors="pt", 
-                       truncation=True, 
-                       padding=True, 
-                       max_length=chunk_size,
-                       stride=overlap, 
-                       return_overflowing_tokens=True, 
-                       return_special_tokens_mask=True).to(device)
+# def get_bert_prediction(preprocessed_text, chunk_size=512, overlap=50):
+#     # Tokenize the text with truncation and chunking
+#     inputs = tokenizer(preprocessed_text, 
+#                        return_tensors="pt", 
+#                        truncation=True, 
+#                        padding=True, 
+#                        max_length=chunk_size,
+#                        stride=overlap, 
+#                        return_overflowing_tokens=True, 
+#                        return_special_tokens_mask=True).to(device)
     
-    # Initialize list to store probabilities
-    all_probs = []
+#     # Initialize list to store probabilities
+#     all_probs = []
 
-    # Process each chunk individually
-    num_chunks = inputs["input_ids"].shape[0]
-    for i in range(num_chunks):
-        # Extract relevant fields for the model
-        chunk_inputs = {
-            "input_ids": inputs["input_ids"][i].unsqueeze(0),
-            "attention_mask": inputs["attention_mask"][i].unsqueeze(0),
-        }
+#     # Process each chunk individually
+#     num_chunks = inputs["input_ids"].shape[0]
+#     for i in range(num_chunks):
+#         # Extract relevant fields for the model
+#         chunk_inputs = {
+#             "input_ids": inputs["input_ids"][i].unsqueeze(0),
+#             "attention_mask": inputs["attention_mask"][i].unsqueeze(0),
+#         }
 
-        # Perform inference with the model
-        outputs = model(**chunk_inputs)
-        # Get output probabilities by applying softmax
-        probs = outputs[0].softmax(1).detach().cpu().numpy()[0]
-        all_probs.append(probs)
+#         # Perform inference with the model
+#         outputs = model(**chunk_inputs)
+#         # Get output probabilities by applying softmax
+#         probs = outputs[0].softmax(1).detach().cpu().numpy()[0]
+#         all_probs.append(probs)
 
-    # Aggregate probabilities (average pooling for example)
-    aggregated_probs = sum(all_probs) / len(all_probs)
+#     # Aggregate probabilities (average pooling for example)
+#     aggregated_probs = sum(all_probs) / len(all_probs)
 
-    return aggregated_probs
+#     return aggregated_probs
 
 
 
@@ -316,7 +316,7 @@ if page == "Fake News Detection":
         with button:
             button_pressed = st.button("Analyze")
         with dropdown:
-            selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Decision Tree", "Passive-Aggressive", "BERT"])
+            selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Decision Tree", "Passive-Aggressive"])
     results = {}
     if button_pressed and user_input.strip() and selected_models:
         preprocessed_text, changes = preprocess_text_with_tracking(user_input)
@@ -332,11 +332,11 @@ if page == "Fake News Detection":
         if "Passive-Aggressive" in selected_models:
             passive_aggressive_prediction = get_sklearn_prediction(passive_aggressive_model, preprocessed_text)
             results["Passive-Aggressive"] = passive_aggressive_prediction
-        if "BERT" in selected_models:
-            probs = get_bert_prediction(preprocessed_text)
-            labels = [0,1]
-            prediction_label = labels[np.argmax(probs)]
-            results["BERT"] = prediction_label, probs[prediction_label]
+        # if "BERT" in selected_models:
+        #     probs = get_bert_prediction(preprocessed_text)
+        #     labels = [0,1]
+        #     prediction_label = labels[np.argmax(probs)]
+        #     results["BERT"] = prediction_label, probs[prediction_label]
         
         # Display result in the result column
         with input_col:
