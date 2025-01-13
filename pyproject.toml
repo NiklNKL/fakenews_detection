@@ -21,7 +21,6 @@ dependencies = [
     "seaborn>=0.13.2",
     "spacy>=3.8.3",
     "streamlit>=1.41.1",
-    "tf-keras>=2.18.0",
     "torch>=2.5.1",
     "transformers[torch]>=4.47.1",
     "wordcloud>=1.9.4",
