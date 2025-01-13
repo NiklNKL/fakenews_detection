@@ -2,7 +2,7 @@ import streamlit as st
 import torch
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import numpy as np
 import re
 import contractions
@@ -25,8 +25,8 @@ model_folder = "models"
 model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased")  # Adjust if needed
 
 # Load model and tokenizer from the local directory
-model = DistilBertForSequenceClassification.from_pretrained(model_path).to("cuda")
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+model = AutoModelForSequenceClassification.from_pretrained(model_path).to("cuda")
+tokenizer = AutoTokenizer.from_pretrained(model_path)
 # Load pre-trained models
 log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
 naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
