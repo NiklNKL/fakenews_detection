@@ -22,10 +22,12 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 # Path to your locally saved model
 model_folder = "models"
-model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased")  # Adjust if needed
+model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load model and tokenizer from the local directory
-model = AutoModelForSequenceClassification.from_pretrained(model_path).to("cuda")
+model = AutoModelForSequenceClassification.from_pretrained(model_path, torch_dtype=torch.float16).to(device)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 # Load pre-trained models
 log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
@@ -111,7 +113,7 @@ def get_bert_prediction(preprocessed_text, chunk_size=512, overlap=50):
                        max_length=chunk_size,
                        stride=overlap, 
                        return_overflowing_tokens=True, 
-                       return_special_tokens_mask=True).to("cuda")
+                       return_special_tokens_mask=True).to(device)
     
     # Initialize list to store probabilities
     all_probs = []
