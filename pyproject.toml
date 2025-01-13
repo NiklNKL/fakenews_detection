@@ -21,7 +21,6 @@ dependencies = [
     "seaborn>=0.13.2",
     "spacy>=3.8.3",
     "streamlit>=1.41.1",
-    "torch>=2.5.1",
     "transformers>=4.48.0",
     "wordcloud>=1.9.4",
 ]
