@@ -2,7 +2,7 @@ import streamlit as st
 import torch
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import numpy as np
 import re
 import contractions
@@ -21,12 +21,12 @@ import plotly.express as px
 # Layout configuration
 st.set_page_config(layout="wide")
 # Path to your locally saved model
-model_path = os.path.join(os.getcwd(), "fake-news-bert-base-uncased")  # Adjust if needed
+model_folder = "models"
+model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased")  # Adjust if needed
 
 # Load model and tokenizer from the local directory
-model = AutoModelForSequenceClassification.from_pretrained(model_path).to("cuda")
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model_folder = "models"
+model = DistilBertForSequenceClassification.from_pretrained(model_path).to("cuda")
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 # Load pre-trained models
 log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
 naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
@@ -103,24 +103,30 @@ def preprocess_text_with_tracking(text):
     return processed_text, changes
 
 def get_bert_prediction(preprocessed_text, chunk_size=512, overlap=50):
-    def chunk_text(text, tokenizer, chunk_size, overlap):
-        tokens = tokenizer(text, truncation=False)["input_ids"]
-        chunks = []
-        for i in range(0, len(tokens), chunk_size - overlap):
-            chunks.append(tokens[i:i + chunk_size])
-        return chunks
-
-    # Split the text into chunks
-    chunks = chunk_text(preprocessed_text, tokenizer, chunk_size, overlap)
-
+    # Tokenize the text with truncation and chunking
+    inputs = tokenizer(preprocessed_text, 
+                       return_tensors="pt", 
+                       truncation=True, 
+                       padding=True, 
+                       max_length=chunk_size,
+                       stride=overlap, 
+                       return_overflowing_tokens=True, 
+                       return_special_tokens_mask=True).to("cuda")
+    
     # Initialize list to store probabilities
     all_probs = []
 
-    for chunk in chunks:
-        # Prepare chunk into tokenized sequence
-        inputs = tokenizer(chunk, padding=True, truncation=True, max_length=chunk_size, return_tensors="pt").to("cuda")
+    # Process each chunk individually
+    num_chunks = inputs["input_ids"].shape[0]
+    for i in range(num_chunks):
+        # Extract relevant fields for the model
+        chunk_inputs = {
+            "input_ids": inputs["input_ids"][i].unsqueeze(0),
+            "attention_mask": inputs["attention_mask"][i].unsqueeze(0),
+        }
+
         # Perform inference with the model
-        outputs = model(**inputs)
+        outputs = model(**chunk_inputs)
         # Get output probabilities by applying softmax
         probs = outputs[0].softmax(1).detach().cpu().numpy()[0]
         all_probs.append(probs)
@@ -129,6 +135,8 @@ def get_bert_prediction(preprocessed_text, chunk_size=512, overlap=50):
     aggregated_probs = sum(all_probs) / len(all_probs)
 
     return aggregated_probs
+
+
 
 
 # Preprocess input text and return the prediction
@@ -146,7 +154,11 @@ def get_sklearn_prediction(model, processed_text):
         probas = None
     return prediction, confidence
 
-def render_svg(svg_file_path, title):
+def get_color(label):
+    color = 'limegreen' if label == 0 else 'indianred'
+    return [color]
+
+def render_svg(svg_file_path, title, label):
     """
     Render an SVG file in a Streamlit app.
     
@@ -170,21 +182,27 @@ def render_svg(svg_file_path, title):
         svg_content = file.read()
     st.markdown(f"""
     <div style="text-align: center; margin: 20px;">
-        <h3 style="color: #4CAF50; font-family: Arial, sans-serif;">{title}</h3>
+        <h3 style="color: {get_color(label)}; font-family: Arial, sans-serif;">{title}</h3>
         <div>
             {svg_content}
 
     """, unsafe_allow_html=True)
 
+
+
 def vocab_richness(label):
     # Vocabulary richness distribution
     temp_df = analysis_df[analysis_df['label'] == label]
+    if label == 0:
+        title = "Real News"
+    else:
+        title = "Fake News"
     fig_vocab = px.histogram(
         temp_df, 
-        x='vocab_richness', 
-        color='label', 
+        x='vocab_richness',
         nbins=50, 
-        title="Vocabulary Richness Distribution by Label",
+        title=f"Vocabulary Richness Distribution: {title}",
+        color_discrete_sequence = get_color(label),
     )
     st.plotly_chart(fig_vocab)
     
@@ -194,7 +212,7 @@ def article_length(label):
     fig_length = px.histogram(
         temp_df, 
         x='text_length', 
-        color='label', 
+        color_discrete_sequence = get_color(label),
         nbins=50, 
         title="Article Length Distribution by Label",
     )
@@ -214,7 +232,7 @@ def n_grams(label, ngram_size):
         filtered_data,
         x='ngram',
         y='count',
-        color='category',
+        color_discrete_sequence = get_color(label),
         title=f"Top {ngram_size}-grams in Real and Fake News",
         labels={'ngram': 'N-gram', 'count': 'Frequency'},
         height=600,
@@ -254,12 +272,12 @@ if page == "Dataset Analysis":
 
     # Add Real News WordCloud on the left
     with real_news_col:
-        render_svg(real_news_svg, "Real News WordCloud")
+        render_svg(real_news_svg, "Real News WordCloud", 0)
 
 
     # Add Fake News WordCloud on the right
     with fake_news_col:
-        render_svg(fake_news_svg, "Fake News WordCloud")
+        render_svg(fake_news_svg, "Fake News WordCloud", 1)
 
     col_1, col_2, col_3 = st.columns([1, 2, 1])
     with col_2:
