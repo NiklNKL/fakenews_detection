@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from xml.etree import ElementTree as ET
 import plotly.express as px
+from pathlib import Path
 
 st.set_page_config(
     layout="wide",
@@ -12,8 +13,17 @@ st.set_page_config(
     page_icon="📊",
     )
 
-analysis_df = pd.read_parquet("../data/analysis_df.parquet")
-n_grams_df = pd.read_parquet("../data/precomputed_ngrams_combined.parquet")
+
+
+# Get the root path of the project
+root_path = Path(__file__).resolve().parent.parent.parent  # Adjust based on file location
+
+# Construct paths to the required files
+analysis_df_path = root_path / "data" / "analysis_df.parquet"
+ngrams_df_path = root_path / "data" / "precomputed_ngrams_combined.parquet"
+
+analysis_df = pd.read_parquet(analysis_df_path)
+n_grams_df = pd.read_parquet(ngrams_df_path)
 
 
 def get_color(label):
@@ -121,7 +131,7 @@ with col_2:
 real_news_col, fake_news_col = st.columns(2)
 
 # Path to your SVG files
-output_dir = "../assets/wordclouds"  # Adjust the directory path if needed
+output_dir = f"{root_path}/assets/wordclouds"  # Adjust the directory path if needed
 real_news_svg = os.path.join(output_dir, "real_news.svg")
 fake_news_svg = os.path.join(output_dir, "fake_news.svg")
 
