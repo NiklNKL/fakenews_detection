@@ -18,7 +18,6 @@ st.set_page_config(
 
 root_path = Path(__file__).resolve().parent.parent.parent
 model_folder = f"{root_path}/models"
-model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
 
 @st.cache_resource
 def load_selected_model(model_name):
@@ -28,7 +27,9 @@ def load_selected_model(model_name):
         "Decision Tree": f"{model_folder}/Decision Tree_fake_news_model.pkl",
         "Passive-Aggressive": f"{model_folder}/Passive-Aggressive_fake_news_model.pkl",
     }
-    return joblib.load(model_paths[model_name])
+    return joblib.load(model_paths[model_name], mmap_mode='r')
+
+
 
 
 
@@ -94,6 +95,9 @@ def preprocess_text_with_tracking(text):
 
     return processed_text, changes
 
+@st.cache_data
+def preprocess_text_with_tracking_cached(text):
+    return preprocess_text_with_tracking(text)
 
 # Preprocess input text and return the prediction
 def get_sklearn_prediction(model, processed_text):
@@ -130,7 +134,7 @@ with input_col:
         selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression"])
 results = {}
 if button_pressed and user_input.strip() and selected_models:
-    preprocessed_text, changes = preprocess_text_with_tracking(user_input)
+    preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
     if "Logistic Regression" in selected_models:
         logistic_regression_prediction = get_sklearn_prediction(load_selected_model("Logistic Regression"), preprocessed_text)
         results["Logistic Regression"] = logistic_regression_prediction
