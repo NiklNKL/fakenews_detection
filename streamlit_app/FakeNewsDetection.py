@@ -1,28 +1,25 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
+    page_title="FHDW Student Project: Fake News Detection",
+    page_icon="🎓",
 )
 
-st.write("# Welcome to Streamlit! 👋")
+st.write("## Welcome to the FHDW Student Project:")
+st.write("# Fake News Detection")
 
-st.sidebar.success("Select a demo above.")
+st.sidebar.success("Please select one of the pages from above.")
 
 st.markdown(
     """
-    Streamlit is an open-source app framework built specifically for
-    Machine Learning and Data Science projects.
-    **👈 Select a demo from the sidebar** to see some examples
-    of what Streamlit can do!
-    ### Want to learn more?
-    - Check out [streamlit.io](https://streamlit.io)
-    - Jump into our [documentation](https://docs.streamlit.io)
-    - Ask a question in our [community
-        forums](https://discuss.streamlit.io)
-    ### See more complex demos
-    - Use a neural net to [analyze the Udacity Self-driving Car Image
-        Dataset](https://github.com/streamlit/demo-self-driving)
-    - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
+    This Streamlit app is part of an academic project by students of the FHDW Bergisch Gladbach.
+    
+    The focus was to learn and experiment with natural language processing (NLP) techniques and machine learning models to detect fake news.
+    For that, we used a dataset with news articles labeled as real or fake from the [Fake News Challenge on Kaggle](https://www.kaggle.com/c/fake-news/overview).
+    
+    You can navigate through the different pages using the sidebar on the left.
+    - **Fake News Detection**: Enter a text and analyze it with different machine learning models. You can compare different models and see the prediction results as well as steps taken in language processing.
+    - **Training Data Analysis**: Explore the dataset and see the distribution of real and fake news, the vocabulary richness, and the most common n-grams.
+    - **Model Evaluation**: Evaluate the performance of the machine learning models used in the Fake News Detection page.
 """
 )
