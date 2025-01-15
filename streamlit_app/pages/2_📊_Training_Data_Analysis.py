@@ -16,14 +16,10 @@ st.set_page_config(
 
 
 # Get the root path of the project
-root_path = Path(__file__).resolve().parent.parent.parent  # Adjust based on file location
+root_path = Path(__file__).resolve().parent.parent.parent 
 
-# Construct paths to the required files
-analysis_df_path = root_path / "data" / "analysis_df.parquet"
-ngrams_df_path = root_path / "data" / "precomputed_ngrams_combined.parquet"
-
-analysis_df = pd.read_parquet(analysis_df_path)
-n_grams_df = pd.read_parquet(ngrams_df_path)
+analysis_df = pd.read_parquet(f"{root_path}/data/analysis_df.parquet")
+n_grams_df = pd.read_parquet(f"{root_path}/data/precomputed_ngrams_combined.parquet")
 
 
 def get_color(label):

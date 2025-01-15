@@ -7,6 +7,8 @@ import os
 import joblib
 import pandas as pd
 import plotly.graph_objects as go
+from pathlib import Path
+
 
 st.set_page_config(
     layout="wide",
@@ -14,7 +16,9 @@ st.set_page_config(
     page_icon="🤖"
     )
 
-model_folder = "../models"
+root_path = Path(__file__).resolve().parent.parent.parent 
+
+model_folder = f"{root_path}/models"
 model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
 
 log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
