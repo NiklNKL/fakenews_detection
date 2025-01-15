@@ -21,17 +21,14 @@ root_path = Path(__file__).resolve().parent.parent.parent
 model_folder = f"{root_path}/models"
 model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
 
-log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
-naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
-decision_tree_model = joblib.load(f'{model_folder}/Decision Tree_fake_news_model.pkl')
-passive_aggressive_model = joblib.load(f'{model_folder}/Passive-Aggressive_fake_news_model.pkl')
+# log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
+# naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
+# decision_tree_model = joblib.load(f'{model_folder}/Decision Tree_fake_news_model.pkl')
+# passive_aggressive_model = joblib.load(f'{model_folder}/Passive-Aggressive_fake_news_model.pkl')
 
 # Load SpaCy for preprocessing
 nlp = spacy.load('en_core_web_sm', disable=['tagger', 'parser', 'ner'])
 stopwords = nlp.Defaults.stop_words
-
-df = pd.read_parquet(f"{root_path}/data/train_cleaned.parquet")
-
 
 def preprocess_text_with_tracking(text):
     """
@@ -124,22 +121,23 @@ with input_col:
     with button:
         button_pressed = st.button("Analyze")
     with dropdown:
-        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Decision Tree", "Passive-Aggressive"])
+        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression"])
 results = {}
 if button_pressed and user_input.strip() and selected_models:
     preprocessed_text, changes = preprocess_text_with_tracking(user_input)
     if "Logistic Regression" in selected_models:
-        logistic_regression_prediction = get_sklearn_prediction(log_reg_model, preprocessed_text)
-        results["Logistic Regression"] = logistic_regression_prediction
-    if "Naive Bayes" in selected_models:
-        naive_bayes_prediction = get_sklearn_prediction(naive_bayes_model, preprocessed_text)
-        results["Naive Bayes"] = naive_bayes_prediction
-    if "Decision Tree" in selected_models:
-        decision_tree_prediction = get_sklearn_prediction(decision_tree_model, preprocessed_text)
-        results["Decision Tree"] = decision_tree_prediction
-    if "Passive-Aggressive" in selected_models:
-        passive_aggressive_prediction = get_sklearn_prediction(passive_aggressive_model, preprocessed_text)
-        results["Passive-Aggressive"] = passive_aggressive_prediction
+        # logistic_regression_prediction = get_sklearn_prediction(log_reg_model, preprocessed_text)
+        # results["Logistic Regression"] = logistic_regression_prediction
+        results["Logistic Regression"] = (0, 0.9)
+    # if "Naive Bayes" in selected_models:
+    #     naive_bayes_prediction = get_sklearn_prediction(naive_bayes_model, preprocessed_text)
+    #     results["Naive Bayes"] = naive_bayes_prediction
+    # if "Decision Tree" in selected_models:
+    #     decision_tree_prediction = get_sklearn_prediction(decision_tree_model, preprocessed_text)
+    #     results["Decision Tree"] = decision_tree_prediction
+    # if "Passive-Aggressive" in selected_models:
+    #     passive_aggressive_prediction = get_sklearn_prediction(passive_aggressive_model, preprocessed_text)
+    #     results["Passive-Aggressive"] = passive_aggressive_prediction
     # if "BERT" in selected_models:
     #     probs = get_bert_prediction(preprocessed_text)
     #     labels = [0,1]
