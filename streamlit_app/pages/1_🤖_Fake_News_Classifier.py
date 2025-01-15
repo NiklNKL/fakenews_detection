@@ -20,7 +20,7 @@ root_path = Path(__file__).resolve().parent.parent.parent
 model_folder = f"{root_path}/models"
 
 @st.cache_resource
-def load_selected_model(model_name):
+def load_model(model_name):
     model_paths = {
         "Logistic Regression": f"{model_folder}/Logistic Regression_fake_news_model.pkl",
         "Naive Bayes": f"{model_folder}/Naive Bayes_fake_news_model.pkl",
@@ -30,7 +30,19 @@ def load_selected_model(model_name):
     return joblib.load(model_paths[model_name], mmap_mode='r')
 
 
+# Store loaded models
+loaded_models = {}
 
+# Function to load models dynamically
+def load_selected_models(selected_models):
+    loaded_models = {}
+    for model_name in selected_models:
+        if model_name not in loaded_models:
+            try:
+                loaded_models[model_name] = load_model(model_name)
+            except ValueError as e:
+                st.error(str(e))
+    return loaded_models
 
 
 # Load SpaCy for preprocessing
@@ -131,28 +143,31 @@ with input_col:
     with button:
         button_pressed = st.button("Analyze")
     with dropdown:
-        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression"])
+        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Decision Tree", "Passive-Aggressive"])
 results = {}
 if button_pressed and user_input.strip() and selected_models:
+    # Preprocess text and cache it for reuse
     preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
-    if "Logistic Regression" in selected_models:
-        logistic_regression_prediction = get_sklearn_prediction(load_selected_model("Logistic Regression"), preprocessed_text)
-        results["Logistic Regression"] = logistic_regression_prediction
+    
+    # Dynamically load and process selected models
+    loaded_models = load_selected_models(selected_models)
+    
+    for model_name, model in loaded_models.items():
+        if model_name == "Logistic Regression":
+            prediction = get_sklearn_prediction(model, preprocessed_text)
+            results["Logistic Regression"] = prediction
         
-    # if "Naive Bayes" in selected_models:
-    #     naive_bayes_prediction = get_sklearn_prediction(naive_bayes_model, preprocessed_text)
-    #     results["Naive Bayes"] = naive_bayes_prediction
-    # if "Decision Tree" in selected_models:
-    #     decision_tree_prediction = get_sklearn_prediction(decision_tree_model, preprocessed_text)
-    #     results["Decision Tree"] = decision_tree_prediction
-    # if "Passive-Aggressive" in selected_models:
-    #     passive_aggressive_prediction = get_sklearn_prediction(passive_aggressive_model, preprocessed_text)
-    #     results["Passive-Aggressive"] = passive_aggressive_prediction
-    # if "BERT" in selected_models:
-    #     probs = get_bert_prediction(preprocessed_text)
-    #     labels = [0,1]
-    #     prediction_label = labels[np.argmax(probs)]
-    #     results["BERT"] = prediction_label, probs[prediction_label]
+        if model_name == "Naive Bayes":
+            prediction = get_sklearn_prediction(model, preprocessed_text)
+            results["Naive Bayes"] = prediction
+        
+        if model_name == "Decision Tree":
+            prediction = get_sklearn_prediction(model, preprocessed_text)
+            results["Decision Tree"] = prediction
+        
+        if model_name == "Passive-Aggressive":
+            prediction = get_sklearn_prediction(model, preprocessed_text)
+            results["Passive-Aggressive"] = prediction
     
     # Display result in the result column
     with input_col:
