@@ -10,11 +10,8 @@ import spacy
 import os
 import joblib
 import pandas as pd
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import PassiveAggressiveClassifier
 from PIL import Image
 import plotly.graph_objects as go
-import os
 from xml.etree import ElementTree as ET
 import plotly.express as px
 
