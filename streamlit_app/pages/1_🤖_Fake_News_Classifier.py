@@ -16,15 +16,21 @@ st.set_page_config(
     page_icon="🤖"
     )
 
-root_path = Path(__file__).resolve().parent.parent.parent 
-
+root_path = Path(__file__).resolve().parent.parent.parent
 model_folder = f"{root_path}/models"
 model_path = os.path.join(os.getcwd(), f"{model_folder}/fake-news-distil_bert-base-uncased") 
 
-# log_reg_model = joblib.load(f'{model_folder}/Logistic Regression_fake_news_model.pkl')
-# naive_bayes_model = joblib.load(f'{model_folder}/Naive Bayes_fake_news_model.pkl')
-# decision_tree_model = joblib.load(f'{model_folder}/Decision Tree_fake_news_model.pkl')
-# passive_aggressive_model = joblib.load(f'{model_folder}/Passive-Aggressive_fake_news_model.pkl')
+@st.cache_resource
+def load_selected_model(model_name):
+    model_paths = {
+        "Logistic Regression": f"{model_folder}/Logistic Regression_fake_news_model.pkl",
+        "Naive Bayes": f"{model_folder}/Naive Bayes_fake_news_model.pkl",
+        "Decision Tree": f"{model_folder}/Decision Tree_fake_news_model.pkl",
+        "Passive-Aggressive": f"{model_folder}/Passive-Aggressive_fake_news_model.pkl",
+    }
+    return joblib.load(model_paths[model_name])
+
+
 
 # Load SpaCy for preprocessing
 nlp = spacy.load('en_core_web_sm', disable=['tagger', 'parser', 'ner'])
@@ -126,9 +132,9 @@ results = {}
 if button_pressed and user_input.strip() and selected_models:
     preprocessed_text, changes = preprocess_text_with_tracking(user_input)
     if "Logistic Regression" in selected_models:
-        # logistic_regression_prediction = get_sklearn_prediction(log_reg_model, preprocessed_text)
-        # results["Logistic Regression"] = logistic_regression_prediction
-        results["Logistic Regression"] = (0, 0.9)
+        logistic_regression_prediction = get_sklearn_prediction(load_selected_model("Logistic Regression"), preprocessed_text)
+        results["Logistic Regression"] = logistic_regression_prediction
+        
     # if "Naive Bayes" in selected_models:
     #     naive_bayes_prediction = get_sklearn_prediction(naive_bayes_model, preprocessed_text)
     #     results["Naive Bayes"] = naive_bayes_prediction

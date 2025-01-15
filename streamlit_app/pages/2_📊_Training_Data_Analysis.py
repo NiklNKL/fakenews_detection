@@ -18,44 +18,44 @@ st.set_page_config(
 # Get the root path of the project
 root_path = Path(__file__).resolve().parent.parent.parent 
 
-analysis_df = pd.read_parquet(f"{root_path}/data/analysis_df.parquet")
-n_grams_df = pd.read_parquet(f"{root_path}/data/precomputed_ngrams_combined.parquet")
+@st.cache_data
+def load_analysis_df():
+    return pd.read_parquet(f"{root_path}/data/analysis_df.parquet")
+
+@st.cache_data
+def load_ngrams_df():
+    return pd.read_parquet(f"{root_path}/data/precomputed_ngrams_combined.parquet")
+
+@st.cache_resource
+def load_svg(svg_file_path):
+    with open(svg_file_path, "r") as file:
+        return file.read()
+
+# Load data
+analysis_df = load_analysis_df()
+n_grams_df = load_ngrams_df()
+
+# Path to your SVG files
+output_dir = f"{root_path}/assets/wordclouds"  # Adjust the directory path if needed
+real_news_svg = os.path.join(output_dir, "real_news.svg")
+fake_news_svg = os.path.join(output_dir, "fake_news.svg")
+
+# Cached SVG content
+real_news_svg_content = load_svg(real_news_svg)
+fake_news_svg_content = load_svg(fake_news_svg)
 
 
 def get_color(label):
     color = 'limegreen' if label == 0 else 'indianred'
     return [color]
 
-def render_svg(svg_file_path, title, label):
-    """
-    Render an SVG file in a Streamlit app.
-    
-    Args:
-        svg_file_path (str): Path to the SVG file.
-    """
-    # Load the SVG file
-    tree = ET.parse(svg_file_path)
-    root = tree.getroot()
-    should_save = False
-    if 'width' in root.attrib:
-        del root.attrib['width']
-        should_save = True
-    if 'height' in root.attrib:
-        del root.attrib['height']
-        should_save = True
-    if should_save:
-        tree.write(svg_file_path)
-    
-    with open(svg_file_path, "r") as file:
-        svg_content = file.read()
+def render_svg_inline(svg_content, title, label):
     st.markdown(f"""
     <div style="text-align: center; margin: 20px;">
         <h3 style="color: {get_color(label)}; font-family: Arial, sans-serif;">{title}</h3>
         <div>
             {svg_content}
-
     """, unsafe_allow_html=True)
-
 
 
 def vocab_richness(label):
@@ -126,21 +126,11 @@ with col_2:
 # Split the page into two columns
 real_news_col, fake_news_col = st.columns(2)
 
-# Path to your SVG files
-output_dir = f"{root_path}/assets/wordclouds"  # Adjust the directory path if needed
-real_news_svg = os.path.join(output_dir, "real_news.svg")
-fake_news_svg = os.path.join(output_dir, "fake_news.svg")
-
-
-
-# Add Real News WordCloud on the left
 with real_news_col:
-    render_svg(real_news_svg, "Real News WordCloud", 0)
+    render_svg_inline(real_news_svg_content, "Real News WordCloud", 0)
 
-
-# Add Fake News WordCloud on the right
 with fake_news_col:
-    render_svg(fake_news_svg, "Fake News WordCloud", 1)
+    render_svg_inline(fake_news_svg_content, "Fake News WordCloud", 1)
 
 col_1, col_2, col_3 = st.columns([1, 2, 1])
 with col_2:
