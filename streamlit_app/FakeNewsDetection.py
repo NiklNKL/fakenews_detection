@@ -1,10 +1,14 @@
 import streamlit as st
+from pathlib import Path
 
 st.set_page_config(
     page_title="FHDW Student Project: Fake News Detection",
     page_icon="🎓",
 )
 
+root_path = Path(__file__).resolve().parent.parent
+
+st.image(f"{root_path}/assets/FHDW_Logo.jpg")
 st.write("## Welcome to the FHDW Student Project:")
 st.write("# Fake News Detection")
 
