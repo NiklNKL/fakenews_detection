@@ -30,7 +30,7 @@ passive_aggressive_model = joblib.load(f'{model_folder}/Passive-Aggressive_fake_
 nlp = spacy.load('en_core_web_sm', disable=['tagger', 'parser', 'ner'])
 stopwords = nlp.Defaults.stop_words
 
-df = pd.read_parquet("../data/train_cleaned.parquet")
+df = pd.read_parquet(f"{root_path}/data/train_cleaned.parquet")
 
 
 def preprocess_text_with_tracking(text):
