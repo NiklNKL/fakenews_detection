@@ -8,38 +8,6 @@ import torch
 
 import tensorflow as tf
 
-def set_device(use_gpu=True):
-    """
-    Configure TensorFlow to use either GPU or CPU.
-
-    Parameters:
-        use_gpu (bool): Set to True to use GPU, False to use CPU.
-    """
-    if use_gpu:
-        # List all GPUs available
-        gpus = tf.config.list_physical_devices('GPU')
-        if gpus:
-            try:
-                # Set TensorFlow to use the first GPU
-                tf.config.set_visible_devices(gpus[0], 'GPU')
-                tf.config.experimental.set_memory_growth(gpus[0], True)
-                print("GPU is set for TensorFlow.")
-            except RuntimeError as e:
-                print(f"Failed to set GPU: {e}")
-        else:
-            print("No GPU available, falling back to CPU.")
-    else:
-        # Force TensorFlow to use only the CPU
-        try:
-            tf.config.set_visible_devices([], 'GPU')
-            print("CPU is set for TensorFlow.")
-        except RuntimeError as e:
-            print(f"Failed to set CPU: {e}")
-
-# Example usage
-use_gpu = True  # Change to False to use CPU
-set_device(use_gpu)
-
 # Load pre-trained model and tokenizer
 MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -96,8 +64,6 @@ if text_input:
 
 # Load Pretrained Models (TensorFlow and PyTorch)
 model_name = "bert-base-uncased"
-tf_tokenizer = AutoTokenizer.from_pretrained(model_name)
-tf_model = TFAutoModelForMaskedLM.from_pretrained(model_name)
 
 # PyTorch Model
 pt_tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -114,17 +80,8 @@ if masked_text_input:
         st.error("Please include a [MASK] token in your input.")
     else:
         # Tokenize input with [MASK]
-        tf_inputs = tf_tokenizer(masked_text_input, return_tensors="tf")
+
         pt_inputs = pt_tokenizer(masked_text_input, return_tensors="pt")
-        
-        # TensorFlow Prediction
-        tf_outputs = tf_model(tf_inputs)
-        tf_mask_token_index = tf.where(tf_inputs["input_ids"] == tf_tokenizer.mask_token_id)[0][0]
-        tf_mask_token_logits = tf_outputs.logits[0, tf_mask_token_index]
-        tf_top_k = 5
-        tf_top_k_indices = tf.math.top_k(tf_mask_token_logits, k=tf_top_k).indices.numpy()
-        tf_top_k_tokens = [tf_tokenizer.decode([token_id]) for token_id in tf_top_k_indices]
-        tf_top_k_probs = tf.nn.softmax(tf_mask_token_logits).numpy()[tf_top_k_indices]
         
         # PyTorch Prediction
         with torch.no_grad():
@@ -136,18 +93,13 @@ if masked_text_input:
         pt_top_k_tokens = [pt_tokenizer.decode([token_id.item()]) for token_id in pt_top_k_indices]
         pt_top_k_probs = torch.nn.functional.softmax(pt_mask_token_logits, dim=-1)[pt_top_k_indices]
 
-        # Display Results
-        st.write("TensorFlow Model Predictions for [MASK]:")
-        for token, prob in zip(tf_top_k_tokens, tf_top_k_probs):
-            st.write(f"{token}: {prob:.2%}")
-        
+
         st.write("PyTorch Model Predictions for [MASK]:")
         for token, prob in zip(pt_top_k_tokens, pt_top_k_probs):
             st.write(f"{token}: {prob:.2%}")
         
         # Visualization (same for both models)
         fig, ax = plt.subplots(figsize=(8, 4))
-        ax.barh(tf_top_k_tokens, tf_top_k_probs, label="TensorFlow", color="skyblue", alpha=0.7)
         ax.barh(pt_top_k_tokens, pt_top_k_probs, label="PyTorch", color="lightcoral", alpha=0.7)
         ax.set_xlabel("Probability")
         ax.set_title("Top Predictions for [MASK] (TensorFlow vs PyTorch)")
