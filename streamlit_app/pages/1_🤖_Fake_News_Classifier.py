@@ -22,13 +22,11 @@ model_folder = f"{root_path}/models"
 @st.cache_resource
 def load_model(model_name):
     model_paths = {
-        "Logistic Regression": f"{model_folder}/Logistic Regression_fake_news_model.pkl",
-        "Naive Bayes": f"{model_folder}/Naive Bayes_fake_news_model.pkl",
-        "Decision Tree": f"{model_folder}/Decision Tree_fake_news_model.pkl",
-        "Passive-Aggressive": f"{model_folder}/Passive-Aggressive_fake_news_model.pkl",
+        "Logistic Regression": f"{model_folder}/Logistic_Regression_model.pkl",
+        "Naive Bayes": f"{model_folder}/Naive_Bayes_model.pkl",
+        "Passive-Aggressive": f"{model_folder}/Passive_Aggressive_model.pkl",
     }
     return joblib.load(model_paths[model_name], mmap_mode='r')
-
 
 # Store loaded models
 loaded_models = {}
@@ -131,8 +129,6 @@ col1, col2, col3 = st.columns([1, 2, 2])
 with col2:
     st.title("Fake News Detection")
 
-
-
 # Create columns for better horizontal layout
 empty, input_col, steps_col = st.columns([1, 2, 2], gap="medium")
 
@@ -143,31 +139,19 @@ with input_col:
     with button:
         button_pressed = st.button("Analyze")
     with dropdown:
-        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Decision Tree", "Passive-Aggressive"])
+        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Passive-Aggressive", 
+            "Support Vector Machine"])
 results = {}
 if button_pressed and user_input.strip() and selected_models:
     # Preprocess text and cache it for reuse
     preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
-    
+    st.write("Preprocessed Text:", preprocessed_text)
     # Dynamically load and process selected models
     loaded_models = load_selected_models(selected_models)
-    
+
     for model_name, model in loaded_models.items():
-        if model_name == "Logistic Regression":
-            prediction = get_sklearn_prediction(model, preprocessed_text)
-            results["Logistic Regression"] = prediction
-        
-        if model_name == "Naive Bayes":
-            prediction = get_sklearn_prediction(model, preprocessed_text)
-            results["Naive Bayes"] = prediction
-        
-        if model_name == "Decision Tree":
-            prediction = get_sklearn_prediction(model, preprocessed_text)
-            results["Decision Tree"] = prediction
-        
-        if model_name == "Passive-Aggressive":
-            prediction = get_sklearn_prediction(model, preprocessed_text)
-            results["Passive-Aggressive"] = prediction
+        prediction, confidence = get_sklearn_prediction(model, preprocessed_text)
+        results[model_name] = (prediction, confidence)
     
     # Display result in the result column
     with input_col:
