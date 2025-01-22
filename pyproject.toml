@@ -8,7 +8,6 @@ dependencies = [
     "contractions>=0.1.73",
     "en-core-web-sm",
     "fastparquet>=2024.11.0",
-    "fasttext>=0.9.3",
     "huggingface-hub[cli]>=0.27.1",
     "ipykernel>=6.29.5",
     "joblib>=1.4.2",
