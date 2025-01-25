@@ -1,9 +1,7 @@
 import torch
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 from components.utils import visualize_attention, get_attention_score
+
 
 def sentiment_analysis_component(sent_tokenizer, sent_model, device):
     # Caching tokenization and inference for sentiment analysis
@@ -68,15 +66,40 @@ def sentiment_analysis_component(sent_tokenizer, sent_model, device):
     with col_3:
         with st.expander("ℹ️ What's happening here?"):
             st.markdown("""
-                
+                - **Sentiment Analysis**: Determines the sentiment of the input text.
+                - **How to use it**: Enter a sentence in the text area and click the "Run Sentiment Analysis" button.
+                - **Example**: "I love this product!" or "This is the worst service ever."
+                - **How it works**: 
+                    1. The input sentence is tokenized and fed into a pre-trained sentiment analysis model.
+                    2. The model predicts the sentiment (positive or negative) and the confidence level.
+                    3. If available, attention scores are visualized to show which words contributed most to the sentiment.
+                - **Applications**: Sentiment analysis is used in customer feedback analysis, social media monitoring, and market research.
+                - **Note**: The attention visualization helps in understanding which parts of the text influenced the sentiment prediction.
+                - **Model**: This component uses a pre-trained BERT model fine-tuned for sentiment analysis. Links to the model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english).
+                - **Additional Info**: Sentiment analysis models are trained on large datasets of labeled text to understand the sentiment behind the words. You can read more about it [here](https://huggingface.co/blog/sentiment-analysis-python).
             """)
     with col_4:
         with st.expander("💻 Code for Component"):
             # Code snippet
             st.markdown("##### 🛠️ Installation Requirements:")
-            st.code("""pip install torch transformers scikit-learn""")
+            st.code("""pip install torch transformers""")
             st.markdown("##### 🖨️ Code used in Component*:")
             st.code("""
-            
+                from transformers import AutoTokenizer, AutoModelForSequenceClassification
+                import torch
+                    
+                model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+                tokenizer = AutoTokenizer.from_pretrained(model_name)
+                model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+                def analyze_sentiment(text_input: str):
+                    inputs = tokenizer(text_input, return_tensors="pt", truncation=True, padding=True)
+                    with torch.no_grad():
+                        outputs = model(**inputs)
+                    logits = outputs.logits
+                    prediction = torch.nn.functional.softmax(logits, dim=-1)
+                    confidence = torch.max(prediction).item()
+                    sentiment = "POSITIVE" if torch.argmax(prediction, dim=-1).item() == 1 else "NEGATIVE"
+                    return sentiment, confidence
                 """)
             st.write("*Code without Streamlit UI Components")

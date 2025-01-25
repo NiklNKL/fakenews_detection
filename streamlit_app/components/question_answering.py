@@ -45,15 +45,52 @@ def qa_component(qa_pipeline):
     with col_1:
         with st.expander("ℹ️ What's happening here?"):
             st.markdown("""
-                
+                - **Question Answering (QA)**: Extracts answers from a given context based on a question.
+                - **How to use it**: Enter a context (a paragraph) in the text area and a question in the text input, then click the "Run QA" button.
+                - **Example**: 
+                    - Context: "The Eiffel Tower is located in Paris and was completed in 1889."
+                    - Question: "Where is the Eiffel Tower located?"
+                - **How it works**: 
+                    1. The input context and question are fed into a pre-trained QA model.
+                    2. The model predicts the answer span within the context.
+                    3. The answer and its confidence score are displayed.
+                    4. A bar chart shows the top 3 most confident answers.
+                - **Applications**: QA is used in chatbots, virtual assistants, and information retrieval systems.
+                - **Model**: This component uses a pre-trained BERT model fine-tuned for QA tasks. Links to the model can be found [here](https://huggingface.co/transformers/pretrained_models.html).
+                - **Note**: The biggest difference between BERT and LLMs is that BERT can only predict tokens that appear in the input, whereas LLMs can predict using any token.
+                - **Additional Info**: QA models are trained on large datasets of question-context pairs to accurately extract answers. You can read more about it [here](https://huggingface.co/transformers/task_summary.html#question-answering).
             """)
     with col_2:
         with st.expander("💻 Code for Component"):
             # Code snippet
             st.markdown("##### 🛠️ Installation Requirements:")
-            st.code("""pip install torch transformers scikit-learn""")
+            st.code("""pip install torch transformers""")
             st.markdown("##### 🖨️ Code used in Component*:")
-            st.code("""
+            st.code(""" 
+            from transformers import AutoTokenizer, AutoModelForQuestionAnswering
+            import torch
             
+            model_name = "distilbert-base-uncased-distilled-squad"
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+
+            def qa_pipeline(inputs):
+                context = inputs['context']
+                question = inputs['question']
+                
+                inputs = tokenizer.encode_plus(question, context, return_tensors="pt")
+                with torch.no_grad():
+                    outputs = model(**inputs)
+                
+                answer_start_scores = outputs.start_logits
+                answer_end_scores = outputs.end_logits
+                
+                answer_start = torch.argmax(answer_start_scores)
+                answer_end = torch.argmax(answer_end_scores) + 1
+                
+                answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs['input_ids'][0][answer_start:answer_end]))
+                score = (torch.max(answer_start_scores) + torch.max(answer_end_scores)) / 2
+                
+                return [{'answer': answer, 'score': score.item()}]
                 """)
             st.write("*Code without Streamlit UI Components")
