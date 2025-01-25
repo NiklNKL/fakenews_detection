@@ -22,21 +22,39 @@ def ner_component(pipeline):
             "I-MISC": "lightcoral",  # Miscellaneous
             "O": "white"  # Outside any named entity
         }
-        
+
         results = pipeline(text)
         entity_counts = Counter()
-        highlighted_text = text
 
-        # Highlight text and count entities
+        # Build the highlighted text incrementally
+        highlighted_segments = []
+        last_end = 0
+
         for entity in results:
             label = entity["entity"]  # Aggregated entity group
             start, end = entity["start"], entity["end"]
             entity_counts[label] += 1
             color = entity_colors.get(label, "white")
-            highlighted_entity = f'<span style="background-color:{color};">{text[start:end]}</span>'
-            highlighted_text = highlighted_text.replace(text[start:end], highlighted_entity)
 
+            # Append non-entity text
+            if start > last_end:
+                highlighted_segments.append(text[last_end:start])
+
+            # Append highlighted entity text
+            highlighted_segments.append(
+                f'<span style="background-color:{color};">{text[start:end]}</span>'
+            )
+
+            last_end = end
+
+        # Append any remaining text after the last entity
+        if last_end < len(text):
+            highlighted_segments.append(text[last_end:])
+
+        # Join all segments into the final highlighted HTML
+        highlighted_text = "".join(highlighted_segments)
         highlighted_text = f'<p style="font-family:monospace;white-space:pre;">{highlighted_text}</p>'
+
         return highlighted_text, entity_counts
     
     entity_names = {
