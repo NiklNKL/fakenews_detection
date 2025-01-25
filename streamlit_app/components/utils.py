@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 import numpy as np
 
-def visualize_attention(tokens, attention_scores, title="Token Attention"):
+def visualize_attention(tokens, attention_scores, title="Token Attention", size=(12, 2)):
     """
     Visualizes attention scores between tokens as a heatmap.
 
@@ -16,7 +16,7 @@ def visualize_attention(tokens, attention_scores, title="Token Attention"):
     Returns:
         matplotlib.figure.Figure: The figure object for the heatmap.
     """
-    fig, ax = plt.subplots(figsize=(12, 2))
+    fig, ax = plt.subplots(figsize=size)
     cmap = sns.color_palette("YlOrRd", as_cmap=True)
     sns.heatmap(
         [attention_scores],

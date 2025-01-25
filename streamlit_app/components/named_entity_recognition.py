@@ -1,8 +1,7 @@
 import streamlit as st
-import torch
 from collections import Counter
 
-def ner_component(ner_tokenizer, ner_model, device):
+def ner_component(pipeline):
     # Named Entity Recognition Section
     
     if 'ner_last_input' not in st.session_state:
@@ -24,27 +23,20 @@ def ner_component(ner_tokenizer, ner_model, device):
             "O": "white"  # Outside any named entity
         }
         
-        inputs = ner_tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(device)
-        outputs = ner_model(**inputs)
-        tokens = ner_tokenizer.convert_ids_to_tokens(inputs['input_ids'][0].tolist())
+        results = pipeline(text)
+        entity_counts = Counter()
+        highlighted_text = text
 
-        highlighted_text = []
-        entity_counts = Counter()  # To store counts of each entity type
-        for i, token in enumerate(tokens):
-            if token.startswith('##'):
-                token = token[2:]
-            label_idx = torch.argmax(outputs.logits[0, i], dim=-1).item()
-            entity = ner_model.config.id2label[label_idx]
-            color = entity_colors.get(entity, "white")
-            highlighted_text.append(f'<span style="background-color:{color};">{token}</span>')
-            
-            if entity != "O":  # Only count entities
-                entity_counts[entity] += 1
+        # Highlight text and count entities
+        for entity in results:
+            label = entity["entity"]  # Aggregated entity group
+            start, end = entity["start"], entity["end"]
+            entity_counts[label] += 1
+            color = entity_colors.get(label, "white")
+            highlighted_entity = f'<span style="background-color:{color};">{text[start:end]}</span>'
+            highlighted_text = highlighted_text.replace(text[start:end], highlighted_entity)
 
-        highlighted_text = " ".join(highlighted_text)
         highlighted_text = f'<p style="font-family:monospace;white-space:pre;">{highlighted_text}</p>'
-        highlighted_text = highlighted_text.replace("[CLS]", "").replace("[SEP]", "").strip()
-        
         return highlighted_text, entity_counts
     
     entity_names = {

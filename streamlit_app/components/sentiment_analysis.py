@@ -3,17 +3,18 @@ import streamlit as st
 from components.utils import visualize_attention, get_attention_score
 
 
-def sentiment_analysis_component(sent_tokenizer, sent_model, device):
+def sentiment_analysis_component(sent_tokenizer, sent_model):
     # Caching tokenization and inference for sentiment analysis
-    @st.cache_data
+    # @st.cache_data
     def sentiment_analysis(text_input: str):
-        inputs = sent_tokenizer(text_input, return_tensors="pt", truncation=True, padding=True).to(device)
+        inputs = sent_tokenizer(text_input, return_tensors="pt", truncation=True, padding=True)
         input_ids = inputs["input_ids"]
         tokens = sent_tokenizer.convert_ids_to_tokens(input_ids[0])
         
-        outputs = sent_model(**inputs)
+        # Forward pass through the model
+        outputs = sent_model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"])
         logits = outputs.logits
-        attentions = outputs.attentions if 'attentions' in outputs.keys() else None
+        attentions = outputs.attentions if hasattr(outputs, "attentions") else None  # Handle attentions safely
         
         prediction = torch.nn.functional.softmax(logits, dim=-1)
         confidence = torch.max(prediction).item()
@@ -25,6 +26,7 @@ def sentiment_analysis_component(sent_tokenizer, sent_model, device):
         
         return sentiment, confidence, tokens, attention_scores
 
+
     if 'sentiment' not in st.session_state:
         st.session_state.sentiment = None
         st.session_state.confidence = None
@@ -35,7 +37,9 @@ def sentiment_analysis_component(sent_tokenizer, sent_model, device):
     col_1, col_2 = st.columns(2)
     with col_1:
         sentient_text_input = st.text_area("Enter text for sentiment analysis")
-        sentiment_button = st.button("Run Sentiment Analysis")
+        col_3, col_4 = st.columns([1, 3])
+        with col_3:
+            sentiment_button = st.button("Run Sentiment Analysis")
 
         if sentient_text_input and sentiment_button:
             if st.session_state.sentiment is None or st.session_state.tokens is None or sentient_text_input != st.session_state.sentient_last_input:
@@ -48,12 +52,12 @@ def sentiment_analysis_component(sent_tokenizer, sent_model, device):
         elif sentiment_button:
             with col_2:
                 st.error("Please enter some text for sentiment analysis.")
-
-        if st.session_state.sentiment is not None:
-            if st.session_state.sentiment == "POSITIVE":
-                st.success(f"Positive Sentiment Detected with {st.session_state.confidence*100:.2f}% confidence!!")
-            else:
-                st.error(f"Negative Sentiment Detected with {st.session_state.confidence*100:.2f}% confidence!!")
+        with col_4:
+            if st.session_state.sentiment is not None:
+                if st.session_state.sentiment == "POSITIVE":
+                    st.success(f"Positive Sentiment Detected with {st.session_state.confidence*100:.2f}% confidence!!")
+                else:
+                    st.error(f"Negative Sentiment Detected with {st.session_state.confidence*100:.2f}% confidence!!")
         
         with col_2:
             if st.session_state.attention_scores is not None:

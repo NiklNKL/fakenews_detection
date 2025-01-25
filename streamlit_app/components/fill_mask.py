@@ -1,9 +1,8 @@
 import streamlit as st
-import torch
 import matplotlib.pyplot as plt
 import psutil
 
-def fill_mask_component(masked_model, masked_tokenizer):
+def fill_mask_component(pipeline):
     
     def get_memory_usage():
         process = psutil.Process()
@@ -24,24 +23,11 @@ def fill_mask_component(masked_model, masked_tokenizer):
         if "[mask]" not in masked_text_input.lower():
             st.error("Please include a [MASK] or ??? token in your input.")
             return None
-        inputs = masked_tokenizer(masked_text_input, return_tensors="pt")
-        with torch.no_grad():
-            outputs = masked_model(**inputs)
-        mask_token_index = torch.where(inputs["input_ids"] == masked_tokenizer.mask_token_id)[1][0]
-        mask_token_logits = outputs.logits[0, mask_token_index]
+        predictions = pipeline(masked_text_input)
         
-        # Get the top 5 predictions
-        number_of_results = 5
-        indices = torch.topk(mask_token_logits, k=number_of_results).indices
-        
-        # Decode token IDs to get token strings
-        tokens = [masked_tokenizer.decode([token_id.item()]) for token_id in indices]
-        
-        # Apply softmax to the logits to get probabilities
-        probs = torch.nn.functional.softmax(mask_token_logits, dim=-1)
-        
-        # Extract probabilities for the top tokens (matching the indices)
-        token_probs = probs[indices].detach().numpy()  # Detach to move out of the computation graph
+        # Extract tokens and probabilities from the pipeline output
+        tokens = [pred["token_str"] for pred in predictions[:5]]
+        token_probs = [pred["score"] for pred in predictions[:5]]
         
         return tokens, token_probs
 
@@ -67,7 +53,7 @@ def fill_mask_component(masked_model, masked_tokenizer):
                 st.session_state.show_memory_button = False
         if st.session_state.masked_tokens is not None:
             # Visualization for masked LM
-            fig, ax = plt.subplots(figsize=(8, 4))
+            fig, ax = plt.subplots(figsize=(8, 2))
             ax.barh(st.session_state.masked_tokens, st.session_state.masked_probs, label="PyTorch-BERT", color="lightcoral", alpha=0.7)
             ax.set_xlabel("Probability")
             ax.set_title("Top Predictions for Masked Token")
