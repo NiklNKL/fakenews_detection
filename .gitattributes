@@ -1,5 +1,5 @@
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.pth filter=lfs diff=lfs merge=lfs -text
 *.safetensors filter=lfs diff=lfs merge=lfs -text
-
-
+big_fake_news_df/* filter=lfs diff=lfs merge=lfs -text
+preprocessed_big_training_df/* filter=lfs diff=lfs merge=lfs -text
