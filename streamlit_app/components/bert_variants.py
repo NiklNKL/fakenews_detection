@@ -12,6 +12,8 @@ def bert_variants_component():
         - Can be fine-tuned for various NLP tasks
         
         [Overview Page with Code Examples](https://huggingface.co/docs/transformers/model_doc/bert)
+
+        You can find pre-trained and fine-tuned BERT models on the [Hugging Face Model Hub](https://huggingface.co/models).
         
         [Read the research paper](https://arxiv.org/abs/1810.04805)
         """

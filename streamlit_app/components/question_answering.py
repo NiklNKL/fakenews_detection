@@ -58,7 +58,7 @@ def qa_component(qa_pipeline):
                     3. The answer and its confidence score are displayed.
                     4. A bar chart shows the top 3 most confident answers.
                 - **Applications**: QA is used in chatbots, virtual assistants, and information retrieval systems.
-                - **Model**: This component uses a pre-trained BERT model fine-tuned for QA tasks. Links to the model can be found [here](https://huggingface.co/transformers/pretrained_models.html).
+                - **Model**: This component uses a pre-trained BERT model fine-tuned for QA tasks. Link to this model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased-distilled-squad).
                 - **Note**: The biggest difference between BERT and LLMs is that BERT can only predict tokens that appear in the input, whereas LLMs can predict using any token.
                 - **Additional Info**: QA models are trained on large datasets of question-context pairs to accurately extract answers. You can read more about it [here](https://huggingface.co/transformers/task_summary.html#question-answering).
             """)
