@@ -1,7 +1,6 @@
 import streamlit as st
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
-import matplotlib.pyplot as plt
 from components.utils import visualize_attention, get_attention_score
 
 def text_similarity_component(tokenizer, model):
@@ -26,8 +25,9 @@ def text_similarity_component(tokenizer, model):
         # Input fields for user-provided sentences
         text1 = st.text_input("Enter the first sentence:")
         text2 = st.text_input("Enter the second sentence:")
-
-        text_similarity_button = st.button("Calculate Similarity")
+        col_3, col_4 = st.columns([1, 4])
+        with col_3:
+            text_similarity_button = st.button("Calculate Similarity")
         
         if text1 and text2 and text_similarity_button:
             if st.session_state.text_similarity_last_text1 is None or st.session_state.text_similarity_last_text2 is None or text1 != st.session_state.text_similarity_last_text1 or text2 != st.session_state.text_similarity_last_text2:
@@ -54,7 +54,15 @@ def text_similarity_component(tokenizer, model):
                 st.session_state.outputs2 = outputs2
                 st.session_state.embeddings1 = embeddings1
                 st.session_state.embeddings2 = embeddings2
-                
+        with col_4:
+            if st.session_state.text_similarity_score is not None:
+                similarity = st.session_state.text_similarity_score
+                if similarity > 0.9:
+                    st.success(f"It has a similar meaning! - Similarity Score: {similarity*100:.2f}%")
+                elif similarity > 0.7:
+                    st.info(f"Could mean something similar. - Similarity Score: {similarity*100:.2f}%")
+                else:
+                    st.error(f"Probably means something different. - Similarity Score: {similarity*100:.2f}%")
     with col_2:     
         if st.session_state.text_similarity_score:
             similarity = st.session_state.text_similarity_score
@@ -64,37 +72,34 @@ def text_similarity_component(tokenizer, model):
             outputs2 = st.session_state.outputs2
             embeddings1 = st.session_state.embeddings1
             embeddings2 = st.session_state.embeddings2
+            _, col_6, _ = st.columns(3)
+            with col_6:
+                st.markdown("### Attention Visualization")
             
-            st.markdown(f"### Similarity Score: {similarity*100:.2f}%", unsafe_allow_html=True)
-
-            
-    col_1, col_2, col_3, col_4, col_5 = st.columns(5)
-    with col_3:
-        st.markdown("### Attention Visualization")
-    if st.session_state.text_similarity_score:
-        col_1, col_2 = st.columns(2)
-        with col_1:
             tokens1 = tokenizer.convert_ids_to_tokens(st.session_state.inputs1["input_ids"][0])
             attention_scores1 = get_attention_score(st.session_state.outputs1)
-            fig1 = visualize_attention(tokens1[1:-1], attention_scores1, title=st.session_state.text_similarity_last_text1)
+            fig1 = visualize_attention(tokens1[1:-1], attention_scores1, title=st.session_state.text_similarity_last_text1, size=(12,1))
             st.pyplot(fig1)
-        with col_2:
+
             tokens2 = tokenizer.convert_ids_to_tokens(st.session_state.inputs2["input_ids"][0])
             attention_scores2 = get_attention_score(st.session_state.outputs2)
-            fig2 = visualize_attention(tokens2[1:-1], attention_scores2, title=st.session_state.text_similarity_last_text2)
+            fig2 = visualize_attention(tokens2[1:-1], attention_scores2, title=st.session_state.text_similarity_last_text2, size=(12,1))
             st.pyplot(fig2)
-    
+            
     col_1, col_2 = st.columns(2)         
     with col_1:
         with st.expander("ℹ️ What's happening here?"):
             st.markdown("""
                 - **Semantic similarity**: Measures how similar two pieces of text are in meaning.
-                - **RoBERTa**: A robustly optimized BERT model, trained to understand context and relationships between words.
+                - **How to use it**: Enter two sentences and click the "Calculate Similarity" button.
+                - **Example**: "I am happy" and "I am sad" have low similarity. "I am happy" and "I am joyful" have high similarity.
                 - **How it works**: 
-                    1. Sentences are converted into embeddings using the RoBERTa model.
+                    1. Sentences are converted into embeddings using the BERT model.
                     2. A **cosine similarity score** (ranging from 0 to 1) is calculated between the two sentence embeddings.
                     3. Higher scores indicate higher similarity.
                 - **Applications**: Text similarity is used in search engines, duplicate detection, and content recommendation systems.
+                - **Note**: The attention visualization shows how the model attends to different parts of the input text.
+                - **Model**: This component uses a pre-trained BERT model to calculate text similarity.
             """)
     with col_2:
         with st.expander("💻 Code for Component"):
@@ -107,7 +112,7 @@ def text_similarity_component(tokenizer, model):
             import torch
             from sklearn.metrics.pairwise import cosine_similarity
 
-            model_name = "bert-base-uncased"
+            model_name = "distilbert-base-uncased"
             tokenizer = AutoTokenizer.from_pretrained(model_name)
             model = AutoModel.from_pretrained(model_name)
 
