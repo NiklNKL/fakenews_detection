@@ -1,6 +1,6 @@
 import streamlit as st
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification, AutoModel
-from components.bert_components import text_similarity_component, ner_component, qa_component, sentiment_analysis_component, fill_mask_component
+from components.bert_components import text_similarity_component, ner_component, qa_component, sentiment_analysis_component, fill_mask_component, bert_variants_component
 
 st.set_page_config(
     layout="wide",
@@ -59,7 +59,8 @@ st.sidebar.markdown(
         <a href="#sentiment-analysis">2. Sentiment Analysis</a><br>
         <a href="#named-entity-recognition">3. Named Entity Recognition</a><br>
         <a href="#question-answering">4. Question Answering</a><br>
-        <a href="#text-similarity">5. Text Similarity</a>
+        <a href="#text-similarity">5. Text Similarity</a><br>
+        <a href="#bert-variants">6. BERT Variants</a>
     </div>
     """,
     unsafe_allow_html=True
@@ -79,6 +80,9 @@ qa_component(qa_pipeline=qa_pipeline)
 
 st.header("Text Similarity")
 text_similarity_component(model=sim_model, tokenizer=sim_tokenizer)
+
+st.header("BERT Variants")
+bert_variants_component()
 
 
 
