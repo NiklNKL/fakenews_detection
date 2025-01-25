@@ -176,4 +176,7 @@ cython_debug/
 /results
 
 # models
-# /fake-news-bert-base-uncased
+models/bert-base-uncased
+models/distilbert-base-uncased
+models/roberta-base
+models/microsoft/deberta-v3-base
