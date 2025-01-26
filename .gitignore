@@ -177,6 +177,6 @@ cython_debug/
 
 # models
 models/bert-base-uncased
-# models/distilbert-base-uncased
-# models/roberta-base
-models/microsoft/deberta-v3-base
+models/distilbert-base-uncased
+models/roberta-base
+models/microsoft_deberta-v3-base
