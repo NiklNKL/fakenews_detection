@@ -22,13 +22,13 @@
     "score"
   ],
   "peft_type": "LORA",
-  "r": 8,
+  "r": 16,
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "v_lin",
     "k_lin",
-    "q_lin"
+    "q_lin",
+    "v_lin"
   ],
   "task_type": "SEQ_CLS",
   "use_dora": false,
