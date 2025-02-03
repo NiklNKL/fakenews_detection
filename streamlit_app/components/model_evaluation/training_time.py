@@ -15,7 +15,7 @@ def training_time_component(data):
     
     
     if st.session_state.time_last_data != data:
-        times = {model: files["summary_logs"]["train_runtime"]
+        times = {model: files["summary_logs"]["train_runtime"].sum()
                 for model, files in data.items() 
                 if "summary_logs" in files}
         
