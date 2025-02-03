@@ -1,0 +1,326 @@
+{
+    "nsubj": {
+        "en": {
+            "readable": "Nominal Subject",
+            "description": "The subject of a verb, typically a noun or noun phrase.",
+            "example": "The cat (subject) sleeps on the couch."
+        },
+        "de": {
+            "readable": "Nominales Subjekt",
+            "description": "Das Subjekt eines Verbs, typischerweise ein Nomen oder eine Nominalphrase.",
+            "example": "Die Katze (Subjekt) schläft auf der Couch."
+        }
+    },
+    "dobj": {
+        "en": {
+            "readable": "Direct Object",
+            "description": "The direct recipient of the action in a sentence.",
+            "example": "She ate the apple."
+        },
+        "de": {
+            "readable": "Direktes Objekt",
+            "description": "Der direkte Empfänger der Handlung in einem Satz.",
+            "example": "Sie aß den Apfel."
+        }
+    },
+    "pobj": {
+        "en": {
+            "readable": "Prepositional Object",
+            "description": "The object of a preposition.",
+            "example": "He walked to the store."
+        },
+        "de": {
+            "readable": "Präpositionalobjekt",
+            "description": "Das Objekt einer Präposition.",
+            "example": "Er ging zum Geschäft."
+        }
+    },
+    "advmod": {
+        "en": {
+            "readable": "Adverbial Modifier",
+            "description": "A word that modifies a verb, adjective, or another adverb.",
+            "example": "She spoke very quietly."
+        },
+        "de": {
+            "readable": "Adverbiale Modifikation",
+            "description": "Ein Wort, das ein Verb, Adjektiv oder ein anderes Adverb modifiziert.",
+            "example": "Sie sprach sehr leise."
+        }
+    },
+    "amod": {
+        "en": {
+            "readable": "Adjectival Modifier",
+            "description": "An adjective that modifies a noun.",
+            "example": "The red car drove fast."
+        },
+        "de": {
+            "readable": "Adjektivische Modifikation",
+            "description": "Ein Adjektiv, das ein Nomen modifiziert.",
+            "example": "Das rote Auto fuhr schnell."
+        }
+    },
+    "compound": {
+        "en": {
+            "readable": "Compound",
+            "description": "A word group that functions as a single unit.",
+            "example": "Machine learning algorithms."
+        },
+        "de": {
+            "readable": "Kompositum",
+            "description": "Eine Wortgruppe, die als einzelne Einheit funktioniert.",
+            "example": "Maschinelle Lernalgorithmen."
+        }
+    },
+    "prep": {
+        "en": {
+            "readable": "Preposition",
+            "description": "A word governing a noun or pronoun to show its relation to another word.",
+            "example": "The book is on the table."
+        },
+        "de": {
+            "readable": "Präposition",
+            "description": "Ein Wort, das ein Nomen oder Pronomen regiert und dessen Beziehung zu einem anderen Wort zeigt.",
+            "example": "Das Buch ist auf dem Tisch."
+        }
+    },
+    "iobj": {
+        "en": {
+            "readable": "Indirect Object",
+            "description": "The recipient of the direct object in a sentence.",
+            "example": "She gave him a book."
+        },
+        "de": {
+            "readable": "Indirektes Objekt",
+            "description": "Der Empfänger des direkten Objekts in einem Satz.",
+            "example": "Sie gab ihm ein Buch."
+        }
+    },
+    "cc": {
+        "en": {
+            "readable": "Coordinating Conjunction",
+            "description": "A word that joins words, phrases, or clauses of equal syntactic importance.",
+            "example": "She likes tea and coffee."
+        },
+        "de": {
+            "readable": "Koordinierende Konjunktion",
+            "description": "Ein Wort, das Wörter, Phrasen oder Sätze von gleicher syntaktischer Bedeutung verbindet.",
+            "example": "Sie mag Tee und Kaffee."
+        }
+    },
+    "conj": {
+        "en": {
+            "readable": "Conjunction",
+            "description": "A word used to connect clauses or sentences.",
+            "example": "He runs and she walks."
+        },
+        "de": {
+            "readable": "Konjunktion",
+            "description": "Ein Wort, das Sätze oder Satzteile verbindet.",
+            "example": "Er rennt und sie geht."
+        }
+    },
+    "poss": {
+        "en": {
+            "readable": "Possessive Modifier",
+            "description": "Indicates possession of a noun.",
+            "example": "John’s book is on the table."
+        },
+        "de": {
+            "readable": "Possessiv-Modifikator",
+            "description": "Zeigt den Besitz eines Nomens an.",
+            "example": "Johns Buch liegt auf dem Tisch."
+        }
+    },
+    "ccomp": {
+        "en": {
+            "readable": "Clausal Complement",
+            "description": "A dependent clause that acts as a complement to a verb.",
+            "example": "She said that he was late."
+        },
+        "de": {
+            "readable": "Klausuläres Komplement",
+            "description": "Ein Nebensatz, der als Ergänzung zu einem Verb dient.",
+            "example": "Sie sagte, dass er zu spät war."
+        }
+    },
+    "nmod": {
+        "en": {
+            "readable": "Noun Modifier",
+            "description": "A word or phrase that modifies a noun.",
+            "example": "The car door is open."
+        },
+        "de": {
+            "readable": "Nominal-Modifikator",
+            "description": "Ein Wort oder eine Phrase, die ein Nomen modifiziert.",
+            "example": "Die Autotür ist offen."
+        }
+    },
+    "npadvmod": {
+        "en": {
+            "readable": "Noun Phrase Adverbial Modifier",
+            "description": "A noun phrase functioning as an adverbial modifier.",
+            "example": "She left last night."
+        },
+        "de": {
+            "readable": "Nominalphrase Adverbial-Modifikator",
+            "description": "Eine Nominalphrase, die als adverbiale Modifikation dient.",
+            "example": "Sie ging letzte Nacht weg."
+        }
+    },
+    "appos": {
+        "en": {
+            "readable": "Appositional Modifier",
+            "description": "A noun phrase that renames another noun phrase.",
+            "example": "My friend, the doctor, is here."
+        },
+        "de": {
+            "readable": "Appositionale Modifikation",
+            "description": "Eine Nominalphrase, die eine andere Nominalphrase umbenennt.",
+            "example": "Mein Freund, der Arzt, ist hier."
+        }
+    },
+    "det": {
+        "en": {
+            "readable": "Determiner",
+            "description": "A word that introduces a noun.",
+            "example": "The dog barked loudly."
+        },
+        "de": {
+            "readable": "Determinator",
+            "description": "Ein Wort, das ein Nomen einführt.",
+            "example": "Der Hund bellte laut."
+        }
+    },
+    "punct": {
+        "en": {
+            "readable": "Punctuation",
+            "description": "A punctuation mark in a sentence.",
+            "example": "Hello, how are you?"
+        },
+        "de": {
+            "readable": "Satzzeichen",
+            "description": "Ein Satzzeichen in einem Satz.",
+            "example": "Hallo, wie geht es dir?"
+        }
+    },
+    "xcomp": {
+        "en": {
+            "readable": "Open Clausal Complement",
+            "description": "A complement clause without a subject, referring to the main clause’s subject.",
+            "example": "She wants to leave."
+        },
+        "de": {
+            "readable": "Offenes Klausuläres Komplement",
+            "description": "Ein Ergänzungssatz ohne Subjekt, der sich auf das Subjekt des Hauptsatzes bezieht.",
+            "example": "Sie will gehen."
+        }
+    },
+    "relcl": {
+        "en": {
+            "readable": "Relative Clause Modifier",
+            "description": "A clause that modifies a noun.",
+            "example": "The book that I read was amazing."
+        },
+        "de": {
+            "readable": "Relativsatz-Modifikator",
+            "description": "Ein Satz, der ein Nomen modifiziert.",
+            "example": "Das Buch, das ich gelesen habe, war erstaunlich."
+        }
+    },
+    "mark": {
+        "en": {
+            "readable": "Marker",
+            "description": "A word that introduces a dependent clause.",
+            "example": "She left because she was tired."
+        },
+        "de": {
+            "readable": "Marker",
+            "description": "Ein Wort, das einen Nebensatz einführt.",
+            "example": "Sie ging, weil sie müde war."
+        }
+    },
+    "attr": {
+        "en": {
+            "readable": "Attribute",
+            "description": "A noun phrase that functions as a predicate nominal.",
+            "example": "She is a doctor."
+        },
+        "de": {
+            "readable": "Attribut",
+            "description": "Eine Nominalphrase, die als prädikatives Nomen fungiert.",
+            "example": "Sie ist eine Ärztin."
+        }
+    },
+    "vocative": {
+        "en": {
+            "readable": "Vocative",
+            "description": "A noun phrase that directly addresses someone.",
+            "example": "John, come here!"
+        },
+        "de": {
+            "readable": "Vokativ",
+            "description": "Eine Nominalphrase, die jemanden direkt anspricht.",
+            "example": "John, komm her!"
+        }
+    },
+    "aux": {
+        "en": {
+            "readable": "Auxiliary Verb",
+            "description": "A helping verb used with a main verb.",
+            "example": "She is running fast."
+        },
+        "de": {
+            "readable": "Hilfsverb",
+            "description": "Ein Hilfsverb, das mit einem Hauptverb verwendet wird.",
+            "example": "Sie ist schnell gelaufen."
+        }
+    },
+    "auxpass": {
+        "en": {
+            "readable": "Passive Auxiliary Verb",
+            "description": "An auxiliary verb used to form the passive voice.",
+            "example": "The book was written by her."
+        },
+        "de": {
+            "readable": "Passives Hilfsverb",
+            "description": "Ein Hilfsverb, das zur Bildung des Passivs verwendet wird.",
+            "example": "Das Buch wurde von ihr geschrieben."
+        }
+    },
+    "neg": {
+        "en": {
+            "readable": "Negation Modifier",
+            "description": "A word that negates a verb or clause.",
+            "example": "She does not like coffee."
+        },
+        "de": {
+            "readable": "Negations-Modifikator",
+            "description": "Ein Wort, das ein Verb oder einen Satz negiert.",
+            "example": "Sie mag keinen Kaffee."
+        }
+    },
+    "dep": {
+        "en": {
+            "readable": "Unspecified Dependency",
+            "description": "A generic dependency that does not fit other categories.",
+            "example": "She gave it a try."
+        },
+        "de": {
+            "readable": "Unbestimmte Abhängigkeit",
+            "description": "Eine generische Abhängigkeit, die nicht in andere Kategorien passt.",
+            "example": "Sie gab dem einen Versuch."
+        }
+    },
+    "advcl": {
+        "en": {
+            "readable": "Adverbial Clause Modifier",
+            "description": "A clause that functions as an adverb.",
+            "example": "She left because she was tired."
+        },
+        "de": {
+            "readable": "Adverbialsatz-Modifikator",
+            "description": "Ein Satz, der als Adverb fungiert.",
+            "example": "Sie ging, weil sie müde war."
+        }
+    }
+}

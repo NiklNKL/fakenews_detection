@@ -6,8 +6,8 @@ def article_length_component(df):
     st.title("Article Length Distribution")
     col_1, col_2 = st.columns([1, 1])
 
-    real_df = df[df['label'] == 1]
-    fake_df = df[df['label'] == 0]
+    real_df = df[df['label_names'] == "real"]
+    fake_df = df[df['label_names'] == "fake"]
     with col_1:
         st.subheader("Real News")
         real_graph = px.histogram(
