@@ -1,1 +1,1 @@
-{"total_steps": 27, "total_epochs": 0.9782608695652174, "eval_frequency": 0.25925925925925924, "final_train_loss": 0.2384, "best_eval_loss": 0.24135418236255646, "best_eval_accuracy": 0.901712111604312, "timestamp": "20250202_232307"}
+{"total_steps": 220, "total_epochs": 7.971014492753623, "eval_frequency": 0.2545454545454545, "final_train_loss": 0.067, "best_eval_loss": 0.07878850400447845, "best_eval_accuracy": 0.9717818642993025, "timestamp": "20250203_023541"}
