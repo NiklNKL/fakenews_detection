@@ -8,6 +8,9 @@ import joblib
 import pandas as pd
 import plotly.graph_objects as go
 from pathlib import Path
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from peft import PeftModel
 
 
 st.set_page_config(
@@ -21,26 +24,21 @@ model_folder = f"{root_path}/models"
 
 @st.cache_resource
 def load_model(model_name):
-    model_paths = {
-        "Logistic Regression": f"{model_folder}/Logistic_Regression_model.pkl",
-        "Naive Bayes": f"{model_folder}/Naive_Bayes_model.pkl",
-        "Passive-Aggressive": f"{model_folder}/Passive_Aggressive_model.pkl",
-    }
-    return joblib.load(model_paths[model_name], mmap_mode='r')
+    if model_name == "DistilBERT":
+        base_model_path = "distilbert-base-uncased"  # Base DistilBERT model
+        peft_model_path = "../models/with_peft/distilbert-base-uncased"  # Fine-tuned PEFT model
 
-# Store loaded models
-loaded_models = {}
+        tokenizer = AutoTokenizer.from_pretrained(base_model_path)
+        base_model = AutoModelForSequenceClassification.from_pretrained(base_model_path)
 
-# Function to load models dynamically
-def load_selected_models(selected_models):
-    loaded_models = {}
-    for model_name in selected_models:
-        if model_name not in loaded_models:
-            try:
-                loaded_models[model_name] = load_model(model_name)
-            except ValueError as e:
-                st.error(str(e))
-    return loaded_models
+        # Load the PEFT adapter
+        model = PeftModel.from_pretrained(base_model, peft_model_path)
+        model.eval()  # Set to evaluation mode
+
+        return model, tokenizer
+    
+    st.error("Invalid model selection")
+    return None, None
 
 
 # Load SpaCy for preprocessing
@@ -109,20 +107,25 @@ def preprocess_text_with_tracking(text):
 def preprocess_text_with_tracking_cached(text):
     return preprocess_text_with_tracking(text)
 
-# Preprocess input text and return the prediction
-def get_sklearn_prediction(model, processed_text):
 
-    if hasattr(model, 'predict_proba'):
-        probas = model.predict_proba([processed_text])[0]  # Get probabilities for each class
-        prediction = model.predict([processed_text])[0]  # Get the predicted class
-        confidence = probas[prediction]  # Confidence score (probability of the predicted class)
-        
+def get_prediction(model_tuple, processed_text):
+    if isinstance(model_tuple, tuple):  # If it's a PEFT model
+        model, tokenizer = model_tuple
+        inputs = tokenizer(processed_text, return_tensors="pt", truncation=True, padding=True)
+
+        with torch.no_grad():
+            outputs = model(**inputs)
+
+        probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)[0].tolist()
+        prediction = int(torch.argmax(outputs.logits, dim=-1))  # 0 = Fake, 1 = Real
+        confidence = probabilities[prediction]
+
     else:
-        # If the model does not have 'predict_proba', fall back to using 'predict'
-        prediction = model.predict([processed_text])[0]
-        confidence = None  # No confidence if 'predict_proba' is not available
-        probas = None
+        st.error("Error: Model not found!")
+        return None, None
+
     return prediction, confidence
+
 
 col1, col2, col3 = st.columns([1, 2, 2])
 # Streamlit app
@@ -139,75 +142,47 @@ with input_col:
     with button:
         button_pressed = st.button("Analyze")
     with dropdown:
-        selected_models = st.multiselect("Select the models you want to use:", ["Logistic Regression", "Naive Bayes", "Passive-Aggressive", 
-            "Support Vector Machine"])
-results = {}
-if button_pressed and user_input.strip() and selected_models:
+        st.write("Model in use: DistilBERT")
+        
+
+if button_pressed and user_input.strip():
     # Preprocess text and cache it for reuse
     preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
     st.write("Preprocessed Text:", preprocessed_text)
     # Dynamically load and process selected models
-    loaded_models = load_selected_models(selected_models)
+    model, tokenizer = load_model("DistilBERT")
 
-    for model_name, model in loaded_models.items():
-        prediction, confidence = get_sklearn_prediction(model, preprocessed_text)
-        results[model_name] = (prediction, confidence)
-    
-    # Display result in the result column
-    with input_col:
-        st.subheader("Prediction Result")
-        
-        # Count predictions
-        count_0 = sum(1 for value in results.values() if value[0] == 0)
-        count_1 = sum(1 for value in results.values() if value[0] == 1)
+    if model and tokenizer:
+        prediction, confidence = get_prediction((model, tokenizer), preprocessed_text)
 
-        # Display success or error message based on the majority prediction
-        if count_0 > count_1:
-            st.success("This news is probably reliable. You should still verify the information however.")
-            st.write("Number of models predicting reliable news:", count_0 ," of ", len(results))
-        else:
-            st.error("This could be fake news! Please verify the information before sharing.")
-            st.write("Number of models predicting fake news:", count_1 ," of ", len(results))
-        
-        st.write("Individual Model Predictions:")
-        prediction_data = []
-        for key, value in results.items():
-            prediction = "Fake" if value[0] == 1 else "Real"
-            confidence = f"{value[1] * 100:.2f}%" if value[1] is not None else "N/A"
-            prediction_data.append([key, prediction, confidence])
+        # Display Prediction Result in Result Column
+        with input_col:
+            st.subheader("Prediction Result")
 
-        prediction_df = pd.DataFrame(prediction_data, columns=["Model Name", "Prediction", "Confidence"])
-        st.table(prediction_df)
-            
-
-        # Prepare data for the Plotly bar chart
-        model_names = []
-        real_probs = []
-        fake_probs = []
-
-        for model_name, (prediction, confidence) in results.items():
-            model_names.append(model_name)
             if prediction == 0:
-                real_probs.append(confidence)
-                fake_probs.append(1 - confidence if confidence is not None else None)
+                st.success(f"✅ **This news is likely REAL. You should still verify the information however.**")
             else:
-                real_probs.append(1 - confidence if confidence is not None else None)
-                fake_probs.append(confidence)
+                st.error(f"🚨 **This could be FAKE NEWS! Please verify the information before sharing.**")
 
-        # Dynamic Plotly bar chart for model confidence
-        fig = go.Figure(data=[
-            go.Bar(name='Real', x=model_names, y=real_probs, text=[f"{p*100:.2f}%" if p is not None else "N/A" for p in real_probs], textposition='auto', marker_color="green"),
-            go.Bar(name='Fake', x=model_names, y=fake_probs, text=[f"{p*100:.2f}%" if p is not None else "N/A" for p in fake_probs], textposition='auto', marker_color="red")
-        ])
-        fig.update_layout(
-            title="Model Confidence",
-            yaxis=dict(title="Confidence Level", range=[0, 1]),
-            xaxis=dict(title="Models"),
-            barmode='group',
-            plot_bgcolor="rgba(0,0,0,0)",
-            width=600
-        )
-        st.plotly_chart(fig)
+            # Display confidence level
+            st.write(f"**Confidence Level:** {confidence * 100:.2f}%")
+
+            # Gauge Chart for Confidence Visualization
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=confidence * 100,
+                title={'text': "Confidence Level"},
+                gauge={
+                    'axis': {'range': [0, 100]},
+                    'bar': {'color': "darkblue"},
+                    'steps': [
+                        {'range': [0, 50], 'color': "red"},
+                        {'range': [50, 100], 'color': "green"}
+                    ],
+                }
+            ))
+
+            st.plotly_chart(fig)
 
     # Additional statistics about the text in the stats column
     with steps_col:
