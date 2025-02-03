@@ -13,9 +13,8 @@ def loss_plots_component(data):
         This component shows the training and evaluation loss curves over time.
         It helps visualize model convergence and potential overfitting.
     """)
-    
 
-    # Create figure if data has changed
+
     if st.session_state.loss_plots_last_data != data:
         fig = go.Figure()
         
@@ -48,7 +47,6 @@ def loss_plots_component(data):
         st.session_state.loss_plots_last_data = data
     
     st.plotly_chart(st.session_state.loss_fig, use_container_width=True)
-    
     
     with st.expander("ℹ️ About Loss Plots"):
         st.markdown("""

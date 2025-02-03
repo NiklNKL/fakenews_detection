@@ -1,6 +1,13 @@
 import streamlit as st
 import plotly.express as px
 
+def format_time(seconds):
+    """Convert seconds to formatted string (hours, minutes, seconds)"""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    return f"{hours}h {minutes}m {secs}s"
+
 def training_time_component(data):
     """Component for displaying training time comparison"""
     
@@ -19,11 +26,15 @@ def training_time_component(data):
                 for model, files in data.items() 
                 if "summary_logs" in files}
         
+        times_in_minutes = {model: time / 60 for model, time in times.items()}
+        hover_texts = {model: format_time(time) for model, time in times.items()}
+        
         fig = px.bar(
-            x=list(times.keys()),
-            y=list(times.values()),
+            x=list(times_in_minutes.keys()),
+            y=list(times_in_minutes.values()),
             title="Training Time Comparison",
-            labels={'x': 'Model', 'y': 'Total Training Time (s)'}
+            labels={'x': 'Model', 'y': 'Total Training Time (minutes)'},
+            text=list(hover_texts.values())
         )
         fig.update_layout(
             height=500,
@@ -42,4 +53,9 @@ def training_time_component(data):
             - Helps evaluate computational efficiency
             - Consider trade-off between time and performance
             - Useful for resource planning
+            
+            System used: 
+            - **CPU:** 13th Gen Intel(R) Core(TM) i5-13600K   3.50 GHz
+            - **GPU:** NVIDIA GeForce RTX 3080
+            - **RAM:** 32GB DDR5 5600MT/s
         """)

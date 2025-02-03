@@ -7,6 +7,8 @@ from components.model_evaluation.confusion_matrix import confusion_matrix_compon
 from components.model_evaluation.calibration_curve import calibration_component
 from components.model_evaluation.training_metrics import training_metrics_component
 from components.model_evaluation.learning_rate_analyis import learning_rate_analysis_component
+from components.model_evaluation.model_performance_info import model_performance_info_component
+
 
 
 __all__ = [
@@ -19,6 +21,7 @@ __all__ = [
     "calibration_component",
     "training_metrics_component",
     "learning_rate_analysis_component",
+    "model_performance_info_component",
     
     
 ]

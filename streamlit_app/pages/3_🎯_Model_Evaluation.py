@@ -12,8 +12,10 @@ from components.evaluation_components import (
     confusion_matrix_component,
     calibration_component,
     training_metrics_component,
-    learning_rate_analysis_component
+    learning_rate_analysis_component,
+    model_performance_info_component,
 )
+from components.utils import model_selection_component
 
 @st.cache_resource
 def load_model_results(base_path):
@@ -58,19 +60,22 @@ section = st.sidebar.radio(
     "Select Analysis Section",
     ["Training Progress", "Model Performance"]
 )
+st.sidebar.title("Model Selection")
+filtered_data = model_selection_component(data)
 
 if section == "Training Progress":
-    loss_plots_component(data)
-    training_time_component(data)
-    training_metrics_component(data)
-    learning_rate_analysis_component(data)
+    loss_plots_component(filtered_data)
+    training_time_component(filtered_data)
+    training_metrics_component(filtered_data)
+    learning_rate_analysis_component(filtered_data)
     
 elif section == "Model Performance":
+    model_performance_info_component()
     metrics_comparison_component(data)
     confusion_matrix_component(data)
-    curves_component(data)
-    confidence_distribution_component(data)
-    calibration_component(data)
+    curves_component(filtered_data)
+    confidence_distribution_component(filtered_data)
+    calibration_component(filtered_data)
     
     
         

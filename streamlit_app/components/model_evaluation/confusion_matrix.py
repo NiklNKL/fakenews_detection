@@ -13,8 +13,11 @@ def confusion_matrix_component(data):
         true positives, true negatives, false positives, and false negatives.
     """)
     
-   # Create a list of models with confusion matrices
-    model_names = [model for model, files in data.items() if "sklearn_confusion" in files]
+    model_aliases = {
+        "roberta-base": "RoBERTa",
+        "bert-base-uncased": "BERT",
+        "distilbert-base-uncased": "DistilBERT"
+    }
     
     if st.session_state.confusion_matrix_last_data != data:
         for model, files in data.items():
@@ -43,8 +46,14 @@ def confusion_matrix_component(data):
                     showscale=False
                 ))
                 
+                base_model_name = model.split(" ")[0] 
+                model_name = model_aliases.get(base_model_name, base_model_name)
+                if "(with_peft)" in model:
+                    model_name += " with PEFT"
+                else:
+                    model_name += " without PEFT"
                 fig.update_layout(
-                    title=f"Confusion Matrix - {model}",
+                    title=model_name,
                     height=400,
                     width=400,
                     xaxis_title="Predicted Label",
@@ -61,25 +70,6 @@ def confusion_matrix_component(data):
         for (model, fig), col in zip(list(st.session_state.confusion_matrix_figs.items())[i:i+3], cols):
             with col:
                 st.plotly_chart(fig, use_container_width=True)
-                
-                # Add metrics derived from confusion matrix
-                if "sklearn_confusion" in data[model]:
-                    df = data[model]["sklearn_confusion"]
-                    cm = df.iloc[:, 1:].values.reshape(2, 2)
-                    tn, fp, fn, tp = cm.ravel()
-                    
-                    accuracy = (tp + tn) / (tp + tn + fp + fn)
-                    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-                    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-                    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-                    
-                    with st.expander("📊 Matrix Metrics"):
-                        st.markdown(f"""
-                            - **Accuracy**: {accuracy:.3f}
-                            - **Precision**: {precision:.3f}
-                            - **Recall**: {recall:.3f}
-                            - **F1 Score**: {f1:.3f}
-                        """)
     
     with st.expander("ℹ️ About Confusion Matrix"):
         st.markdown("""
