@@ -6,7 +6,7 @@ st.set_page_config(
     page_icon="🎓",
 )
 
-root_path = Path(__file__).resolve().parent.parent
+root_path = Path(__file__).resolve().parent
 
 st.image(f"{root_path}/assets/FHDW_Logo.jpg")
 st.write("## Welcome to the FHDW Student Project:")
