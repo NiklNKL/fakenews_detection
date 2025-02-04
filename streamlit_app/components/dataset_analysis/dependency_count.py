@@ -7,7 +7,7 @@ from pathlib import Path
 root_path = Path(__file__).resolve().parent.parent.parent 
 
 # Load dependency labels from JSON file
-with open(f'{root_path}/streamlit_app/components/dataset_analysis/dependency_labels.json', 'r') as file:
+with open(f'{root_path}/components/dataset_analysis/dependency_labels.json', 'r') as file:
     DEPENDENCY_LABELS = json.load(file)
 
 @st.cache_data(show_spinner="Preparing dependency data...")
