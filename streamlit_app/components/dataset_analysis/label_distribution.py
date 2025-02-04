@@ -85,8 +85,8 @@ def dataset_distribution_component(data):
     with col_interp:
         with st.expander("ℹ️ Dataset Analysis"):
             total = original_data['count'].sum()
-            real_pct = original_data[original_data['label_names'] == 'real']['proportion'].iloc[0]*100
-            fake_pct = original_data[original_data['label_names'] == 'fake']['proportion'].iloc[0]*100
+            real_pct = original_data[original_data['label_names'] == 'real']['proportion'].iloc[0]
+            fake_pct = original_data[original_data['label_names'] == 'fake']['proportion'].iloc[0]
             
             st.subheader("Original Dataset Composition")
             st.markdown(f"""

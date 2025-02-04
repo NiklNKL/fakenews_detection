@@ -17,7 +17,7 @@ def text_length_distribution_component(df):
             return f"{bins[-1]}+"
         return None
     
-    df["length_bin"] = df["preprocessed_text"].apply(lambda x: classify_length(len(x) - x.count(" ")))
+    df["length_bin"] = df["raw_text"].apply(lambda x: classify_length(len(x) - x.count(" ")))
 
     bin_counts = df.groupby(['length_bin', 'label_names']).size().unstack(fill_value=0)
     
