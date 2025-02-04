@@ -178,3 +178,4 @@ cython_debug/
 # models
 /models/without_peft/*
 /models/sklearn_models/*
+.temp/*
