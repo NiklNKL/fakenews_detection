@@ -7,8 +7,8 @@ def word_character_count_analysis_component(df):
     """
     st.header("Word and Character Count Analysis")
     
-    df["word_count"] = df["preprocessed_text"].apply(lambda x: len(x.split()))
-    df["body_len"] = df["preprocessed_text"].apply(lambda x: len(x) - x.count(" "))
+    df["word_count"] = df["raw_text"].apply(lambda x: len(x.split()))
+    df["body_len"] = df["raw_text"].apply(lambda x: len(x) - x.count(" "))
 
     word_count_stats = df.groupby("label_names")["word_count"].describe()
     char_count_stats = df.groupby("label_names")["body_len"].describe()
