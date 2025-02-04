@@ -73,10 +73,9 @@ def sentiment_analysis_component(df):
             """)
         with st.expander("ℹ️ About Sentiment Subjectivity"):
             st.markdown("""
-            **Sentiment Polarity** (-1 to 1):
-            - -1 = Very negative sentiment
-            - 0 = Neutral sentiment
-            - 1 = Very positive sentiment
+            **Sentiment Subjectivity** (0 to 1):
+            - 0 = Objective
+            - 1 = Subjective
             
             #### Normalization
             When enabled, distributions are normalized to account for different sample sizes between fake and real news.
