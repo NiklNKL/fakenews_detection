@@ -1,8 +1,5 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
 
 def text_length_distribution_component(df):
     """
@@ -10,7 +7,6 @@ def text_length_distribution_component(df):
     """
     st.header("Text Length Distribution Analysis")
     
-    # Compute body length bins
     bins = [0, 20, 50, 100, 150, 200, 500, 1000, 2000, 3000, 4000, 5000]
     
     def classify_length(length):
@@ -22,29 +18,26 @@ def text_length_distribution_component(df):
         return None
     
     df["length_bin"] = df["preprocessed_text"].apply(lambda x: classify_length(len(x) - x.count(" ")))
-    
-    # Bin counts calculation
+
     bin_counts = df.groupby(['length_bin', 'label_names']).size().unstack(fill_value=0)
     
-    # Normalization toggle
     normalize = st.checkbox("Normalize Distribution", value=True)
     
     if normalize:
         bin_counts = bin_counts.div(bin_counts.sum(axis=0), axis=1)
     
-    # Reorder bins
     bin_order = ["0-20", "20-50", "50-100", "100-150", "150-200", "200-500", 
                  "500-1000", "1000-2000", "2000-3000", "3000-4000", "4000-5000", "5000+"]
     bin_counts = bin_counts.reindex(bin_order)
-    
-    # Plotly bar plot
+
     fig = px.bar(
         bin_counts.reset_index(), 
         x='length_bin', 
         y=['real', 'fake'], 
         title='Text Length Distribution by Category',
         labels={'value': 'Frequency', 'variable': 'Label'},
-        color_discrete_map={'real': 'green', 'fake': 'red'}
+        color_discrete_map={'real': '#4ECB71', 'fake': '#FF6B6B'},
+        barmode='group'
     )
     
     fig.update_layout(

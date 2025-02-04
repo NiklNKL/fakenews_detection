@@ -6,12 +6,12 @@ from components.data_analysis_components import (text_length_distribution_compon
                                                  word_character_count_analysis_component,
                                                 wordcloud_component,
                                                 n_grams_component,
-                                                article_length_component,
-                                                readability_metrics_component,
+                                                indepth_text_statistic_component,
                                                 dependency_analysis_component,
                                                 entity_analysis_component,
                                                 sentiment_analysis_component,
-                                                lexical_diversity_component,
+                                                dataset_distribution_component,
+                                                readability_scores_component,
                                                 )
 
 from components.utils import load_and_concatenate_parquet_files
@@ -44,6 +44,10 @@ def load_ngrams_df():
 def load_preprocessed_df():
     return load_and_concatenate_parquet_files(f"{root_path}/data/preprocessed_df")
 
+@st.cache_data
+def load_label_distribution():
+    return pd.read_parquet(f"{root_path}/data/analysis_dataframes/label_distribution_df.parquet")
+
 @st.cache_resource
 def load_svg():
     root_dir = f"{root_path}/streamlit_app/assets/wordclouds"
@@ -58,6 +62,7 @@ readability_metrics_df = load_readability_metrics()
 dependency_counts_df = load_dependency_counts()
 entity_counts_df = load_entity_counts()
 n_grams_df = load_ngrams_df()
+label_distribution_df = load_label_distribution()
 svg_dict = load_svg()
 preprocessed_df = load_preprocessed_df()
 
@@ -67,33 +72,23 @@ st.write("Interactive visualization of the training data")
 st.sidebar.title("Navigation")
 section = st.sidebar.radio(
     "Select Analysis Section",
-    ["Lexical Features", "Readability Metrics", "Content Analysis", "Sentence Structure Analysis", "Topic Analysis"]
+    ["Lexical Features", "Topic Analysis"]
 )
 
 if section == "Lexical Features":
     st.sidebar.title("Lexical Features")
     st.sidebar.write("Explore the lexical features of the training data")
+    dataset_distribution_component(label_distribution_df)
     text_length_distribution_component(preprocessed_df)
     word_character_count_analysis_component(preprocessed_df)
-    article_length_component(readability_metrics_df)
-    lexical_diversity_component(readability_metrics_df)
-
-elif section == "Readability Metrics":
-    st.sidebar.title("Readability Metrics")
-    st.sidebar.write("Explore the readability metrics of the training data")
-    readability_metrics_component(readability_metrics_df)
-
-elif section == "Content Analysis":
-    st.sidebar.title("Content Analysis")
-    st.sidebar.write("Explore the content analysis of the training data")
-    wordcloud_component(svg_dict)
-    n_grams_component(n_grams_df)
-
-elif section == "Sentence Structure Analysis":
+    indepth_text_statistic_component(readability_metrics_df)
+    readability_scores_component(readability_metrics_df)
     dependency_analysis_component(dependency_counts_df)
     
 elif section == "Topic Analysis":
     st.sidebar.title("Topic Analysis")
     st.sidebar.write("Explore the topic analysis of the training data")
+    wordcloud_component(svg_dict)
+    n_grams_component(n_grams_df)
     entity_analysis_component(entity_counts_df)
     sentiment_analysis_component(readability_metrics_df)

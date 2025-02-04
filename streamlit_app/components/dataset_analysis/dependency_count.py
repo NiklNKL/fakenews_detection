@@ -126,7 +126,9 @@ def dependency_analysis_component(df):
     
     with st.expander(f"{'Dependency Types Explained' if language_code == 'en' else 'Abhängigkeitstypen erklärt'}"):
         cols = st.columns(3)
-        top_dependencies = df_combined.index.tolist()[:9]
+        df_combined["total"] = df_combined["Fake News"] + df_combined["Real News"]
+        df_combined = df_combined.sort_values(by="total", ascending=False)
+        top_dependencies = df_combined.index.tolist()[:top_n]
         for i, dep in enumerate(top_dependencies):
             with cols[i % 3]:
                 try:
@@ -136,6 +138,3 @@ def dependency_analysis_component(df):
                 st.markdown(f"### {details['readable']}")
                 st.markdown(f"**{details['description']}**")
                 st.markdown(f"*{details['example']}*")
-    
-    with st.expander(f"{'Detailed Dependency Counts' if language_code == 'en' else 'Detaillierte Abhängigkeitszähler'}"):
-        st.dataframe(df_combined)

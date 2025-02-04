@@ -67,14 +67,14 @@ def entity_analysis_component(df:pd.DataFrame):
         go.Bar(
             name='Fake News', 
             x=[entity_dict[col] for col in selected_columns], 
-            y=display_data.loc[0, selected_columns],
-            marker_color='red'
+            y=display_data.loc["fake", selected_columns],
+            marker_color='#FF6B6B'
         ),
         go.Bar(
             name='Real News', 
             x=[entity_dict[col] for col in selected_columns], 
-            y=display_data.loc[1, selected_columns],
-            marker_color='green'
+            y=display_data.loc["real", selected_columns],
+            marker_color='#4ECB71'
         )
     ])
     
