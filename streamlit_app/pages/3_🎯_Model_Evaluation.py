@@ -14,8 +14,10 @@ from components.evaluation_components import (
     training_metrics_component,
     learning_rate_analysis_component,
     model_performance_info_component,
+    sklearn_model_performance_component,
 )
 from components.utils import model_selection_component
+root_path = Path(__file__).resolve().parent.parent.parent 
 
 @st.cache_resource
 def load_model_results(base_path):
@@ -39,6 +41,11 @@ def load_model_results(base_path):
     
     return data
 
+@st.cache_data
+def load_sklearn_model_logs():
+    return pd.read_parquet(f"{root_path}/data/model_evaluation/sklearn_models_evaluation.parquet")
+
+
 st.set_page_config(
     page_title="Model Evaluation",
     page_icon="🎯",
@@ -48,35 +55,38 @@ st.set_page_config(
 st.title("Model Analysis Dashboard")
 st.write("Interactive analysis of model training and evaluation results")
 
-root_path = Path(__file__).resolve().parent.parent.parent 
-
 path = f"{root_path}/data/model_evaluation"
 
 data = load_model_results(path)
+sklearn_logs = load_sklearn_model_logs()
 
-# Sidebar for navigation
 st.sidebar.title("Navigation")
 section = st.sidebar.radio(
     "Select Analysis Section",
-    ["Training Progress", "Model Performance"]
+    ["BERT Training Progress", "BERT Model Performance", "Traditional Models"]
 )
-st.sidebar.title("Model Selection")
-filtered_data = model_selection_component(data)
 
-if section == "Training Progress":
+
+if section == "BERT Training Progress":
+    st.sidebar.title("Model Selection")
+    filtered_data = model_selection_component(data)
     loss_plots_component(filtered_data)
     training_time_component(filtered_data)
     training_metrics_component(filtered_data)
     learning_rate_analysis_component(filtered_data)
     
-elif section == "Model Performance":
+elif section == "BERT Model Performance":
+    st.sidebar.title("Model Selection")
+    filtered_data = model_selection_component(data)
     model_performance_info_component()
     metrics_comparison_component(data)
     confusion_matrix_component(data)
     curves_component(filtered_data)
     confidence_distribution_component(filtered_data)
     calibration_component(filtered_data)
-    
+
+elif section == "Traditional Models":
+    sklearn_model_performance_component(sklearn_logs, data)
     
         
 

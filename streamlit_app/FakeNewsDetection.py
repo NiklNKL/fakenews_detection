@@ -19,7 +19,7 @@ st.markdown(
     This Streamlit app is part of an academic project by students of the FHDW Bergisch Gladbach.
     
     The focus was to learn and experiment with natural language processing (NLP) techniques and machine learning models to detect fake news.
-    For that, we used a dataset with news articles labeled as real or fake from the [Fake News Challenge on Kaggle](https://www.kaggle.com/c/fake-news/overview).
+    For that, we used a dataset with news articles labeled as real or fake from the [Fake News Classification Dataset from Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification/data).
     
     You can navigate through the different pages using the sidebar on the left.
     - **Fake News Detection**: Enter a text and analyze it with a fine-tuned DistilBERT Model.

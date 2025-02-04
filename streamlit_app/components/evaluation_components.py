@@ -8,6 +8,7 @@ from components.model_evaluation.calibration_curve import calibration_component
 from components.model_evaluation.training_metrics import training_metrics_component
 from components.model_evaluation.learning_rate_analyis import learning_rate_analysis_component
 from components.model_evaluation.model_performance_info import model_performance_info_component
+from components.model_evaluation.sklearn_model_eval import sklearn_model_performance_component
 
 
 
@@ -22,6 +23,6 @@ __all__ = [
     "training_metrics_component",
     "learning_rate_analysis_component",
     "model_performance_info_component",
-    
+    "sklearn_model_performance_component",
     
 ]
