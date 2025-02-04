@@ -4,7 +4,7 @@ import pandas as pd
 import json
 from pathlib import Path
 
-root_path = Path().resolve().parent
+root_path = Path(__file__).resolve().parent.parent.parent 
 
 # Load dependency labels from JSON file
 with open(f'{root_path}/streamlit_app/components/dataset_analysis/dependency_labels.json', 'r') as file:

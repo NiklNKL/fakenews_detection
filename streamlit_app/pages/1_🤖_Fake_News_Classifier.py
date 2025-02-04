@@ -26,7 +26,7 @@ model_folder = f"{root_path}/models"
 def load_model(model_name):
     if model_name == "DistilBERT":
         base_model_path = "distilbert-base-uncased"  # Base DistilBERT model
-        peft_model_path = "../models/with_peft/distilbert-base-uncased"  # Fine-tuned PEFT model
+        peft_model_path = f"{root_path}/models/with_peft/distilbert-base-uncased"  # Fine-tuned PEFT model
 
         tokenizer = AutoTokenizer.from_pretrained(base_model_path)
         base_model = AutoModelForSequenceClassification.from_pretrained(base_model_path)

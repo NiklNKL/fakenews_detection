@@ -92,9 +92,9 @@ def sklearn_model_performance_component(df, bert_data):
         true positives, true negatives, false positives, and false negatives.
     """)
 
-    if 'confusion_matrix_last_data' not in st.session_state:
-        st.session_state.confusion_matrix_last_data = df
-        st.session_state.confusion_matrix_figs = {}
+    if 'sklearn_confusion_matrix_last_data' not in st.session_state:
+        st.session_state.sklearn_confusion_matrix_last_data = df
+        st.session_state.sklearn_confusion_matrix_figs = {}
 
     for model in df["Model"].unique():
         model_df = df[(df["Model"] == model) & (df["Dataset"] == "Test")]
@@ -129,13 +129,13 @@ def sklearn_model_performance_component(df, bert_data):
                 yaxis_title="Actual Label"
             )
             
-            st.session_state.confusion_matrix_figs[model] = fig
+            st.session_state.sklearn_confusion_matrix_figs[model] = fig
 
-    st.session_state.confusion_matrix_last_data = df
+    st.session_state.sklearn_confusion_matrix_last_data = df
 
-    for i in range(0, len(st.session_state.confusion_matrix_figs), 3):
-        cols = st.columns(min(3, len(st.session_state.confusion_matrix_figs) - i))
-        for (model, fig), col in zip(list(st.session_state.confusion_matrix_figs.items())[i:i+3], cols):
+    for i in range(0, len(st.session_state.sklearn_confusion_matrix_figs), 3):
+        cols = st.columns(min(3, len(st.session_state.sklearn_confusion_matrix_figs) - i))
+        for (model, fig), col in zip(list(st.session_state.sklearn_confusion_matrix_figs.items())[i:i+3], cols):
             with col:
                 st.plotly_chart(fig, use_container_width=True)
 
