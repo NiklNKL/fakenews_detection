@@ -72,13 +72,13 @@ st.write("Interactive visualization of the training data")
 st.sidebar.title("Navigation")
 section = st.sidebar.radio(
     "Select Analysis Section",
-    ["Lexical Features", "Topic Analysis"]
+    ["Topic Analysis", "Lexical Features"]
 )
 
+dataset_distribution_component(label_distribution_df)
 if section == "Lexical Features":
     st.sidebar.title("Lexical Features")
     st.sidebar.write("Explore the lexical features of the training data")
-    dataset_distribution_component(label_distribution_df)
     text_length_distribution_component(preprocessed_df)
     word_character_count_analysis_component(preprocessed_df)
     indepth_text_statistic_component(readability_metrics_df)
