@@ -148,7 +148,7 @@ with input_col:
 if button_pressed and user_input.strip():
     # Preprocess text and cache it for reuse
     preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
-    st.write("Preprocessed Text:", preprocessed_text)
+    
     # Dynamically load and process selected models
     model, tokenizer = load_model("DistilBERT")
 
@@ -164,20 +164,19 @@ if button_pressed and user_input.strip():
             else:
                 st.error(f"🚨 **This could be FAKE NEWS! Please verify the information before sharing.**")
 
-            # Display confidence level
-            st.write(f"**Confidence Level:** {confidence * 100:.2f}%")
-
             # Gauge Chart for Confidence Visualization
             fig = go.Figure(go.Indicator(
                 mode="gauge+number",
                 value=confidence * 100,
+                number={'valueformat': ".2f", 'suffix': "%"},
                 title={'text': "Confidence Level"},
                 gauge={
                     'axis': {'range': [0, 100]},
                     'bar': {'color': "darkblue"},
                     'steps': [
-                        {'range': [0, 50], 'color': "red"},
-                        {'range': [50, 100], 'color': "green"}
+                        {'range': [0, 33], 'color': "#FF6B6B"},   # Red
+                        {'range': [33, 66], 'color': "#FFD700"},  # Yellow
+                        {'range': [66, 100], 'color': "#4ECB71"}  # Green
                     ],
                 }
             ))
@@ -200,3 +199,6 @@ if button_pressed and user_input.strip():
                 st.write(f"{step}. {change}")
         else:
             st.write("No changes were made during preprocessing.")
+        
+        with st.expander("Show Preprocessed Text"):
+            st.write(preprocessed_text)
