@@ -110,7 +110,7 @@ def ner_component(pipeline):
                     3. The tokens are highlighted with different colors based on their entity type.
                     4. The counts of each entity type are displayed.
                 - **Applications**: NER is used in information extraction, question answering, and text summarization.
-                - **Model**: This component uses a pre-trained BERT model fine-tuned for NER tasks. Links to the model can be found [here](https://huggingface.co/transformers/pretrained_models.html).
+                - **Model**: This component uses a pre-trained BERT model fine-tuned for NER tasks. Link to this model can be found [here](https://huggingface.co/dslim/distilbert-NER).
                 - **Additional Info**: NER models are trained on large datasets of labeled text to recognize various entity types. You can read more about it [here](https://huggingface.co/transformers/task_summary.html#named-entity-recognition).
             """)
     with col_2:

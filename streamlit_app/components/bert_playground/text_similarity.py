@@ -99,7 +99,7 @@ def text_similarity_component(tokenizer, model):
                     3. Higher scores indicate higher similarity.
                 - **Applications**: Text similarity is used in search engines, duplicate detection, and content recommendation systems.
                 - **Note**: The attention visualization shows how the model attends to different parts of the input text.
-                - **Model**: This component uses a pre-trained BERT model to calculate text similarity.
+                - **Model**: This component uses a pre-trained BERT model to calculate text similarity. Link to this model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased).
             """)
     with col_2:
         with st.expander("💻 Code for Component"):

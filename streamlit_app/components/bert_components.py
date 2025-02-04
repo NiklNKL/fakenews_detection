@@ -4,6 +4,7 @@ from components.bert_playground.sentiment_analysis import sentiment_analysis_com
 from components.bert_playground.fill_mask import fill_mask_component
 from components.bert_playground.classification import classification_component
 from components.bert_playground.text_similarity import text_similarity_component
+from components.bert_playground.bert_variants import bert_variants_component
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "fill_mask_component",
     "classification_component",
     "text_similarity_component",
+    "bert_variants_component",
 ]

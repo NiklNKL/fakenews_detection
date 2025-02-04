@@ -79,7 +79,7 @@ def sentiment_analysis_component(sent_tokenizer, sent_model):
                     3. If available, attention scores are visualized to show which words contributed most to the sentiment.
                 - **Applications**: Sentiment analysis is used in customer feedback analysis, social media monitoring, and market research.
                 - **Note**: The attention visualization helps in understanding which parts of the text influenced the sentiment prediction.
-                - **Model**: This component uses a pre-trained BERT model fine-tuned for sentiment analysis. Links to the model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english).
+                - **Model**: This component uses a pre-trained BERT model fine-tuned for sentiment analysis. Link to this model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english).
                 - **Additional Info**: Sentiment analysis models are trained on large datasets of labeled text to understand the sentiment behind the words. You can read more about it [here](https://huggingface.co/blog/sentiment-analysis-python).
             """)
     with col_4:

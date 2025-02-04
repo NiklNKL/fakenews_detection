@@ -75,7 +75,7 @@ def fill_mask_component(pipeline):
                     3. The top 5 predictions and their probabilities are displayed.
                 - **Applications**: Masked language modeling is used in text completion, data augmentation, and understanding contextual word meanings.
                 - **Note**: The bar chart visualization shows the top predictions and their probabilities.
-                - **Model**: This component uses a pre-trained BERT model for masked language prediction.
+                - **Model**: This component uses a pre-trained BERT model for masked language prediction. Link to this model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased).
                 - **Additional Info**: Masking tokens was a common technique used in BERT training to make it bidirectional instead of just left-to-right like most LLMs. You can read more about it [here](https://huggingface.co/blog/bert-101#22-what-is-a-masked-language-model).
             """)
     with col_2:
