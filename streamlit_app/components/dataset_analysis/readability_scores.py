@@ -1,76 +1,19 @@
 import streamlit as st
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy.stats import gaussian_kde
 
-def create_distribution_plot(data, metric, title):
-    """
-    Creates a distribution plot for readability metrics
-    """
-    fake_data = data[data['label_names'] == 'fake'][metric]
-    real_data = data[data['label_names'] == 'real'][metric]
-    
-    # Create range for x-axis
-    x_range = np.linspace(
-        min(fake_data.min(), real_data.min()),
-        max(fake_data.max(), real_data.max()),
-        200
-    )
-    
-    # Calculate KDE
-    fake_kde = gaussian_kde(fake_data)
-    real_kde = gaussian_kde(real_data)
-    
-    # Create figure
-    fig = go.Figure()
-    
-    # Add traces for fake and real news
-    fig.add_trace(go.Scatter(
-        x=x_range,
-        y=fake_kde(x_range),
-        name='Fake News',
-        fill='tozeroy',
-        fillcolor='rgba(255,107,107,0.2)',
-        line=dict(color='#FF6B6B', width=2)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=x_range,
-        y=real_kde(x_range),
-        name='Real News',
-        fill='tozeroy',
-        fillcolor='rgba(78,203,113,0.2)',
-        line=dict(color='#4ECB71', width=2)
-    ))
-    
-    # Update layout
-    fig.update_layout(
-        title=title,
-        xaxis_title=metric.replace('_', ' ').title(),
-        yaxis_title='Density',
-        template='plotly_white',
-        height=500,
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        )
-    )
-    
-    return fig
 
 def get_metric_info(metric):
     """
     Returns interpretation and formula information for each metric
     """
     info = {
-        'flesch_reading_ease': {
-            'formula': '206.835 - 1.015(total words/total sentences) - 84.6(total syllables/total words)',
-            'interpretation': """
+        "flesch_reading_ease": {
+            "formula": "206.835 - 1.015(total words/total sentences) - 84.6(total syllables/total words)",
+            "interpretation": """
             ### Flesch Reading Ease Score
             
             **Score Interpretation:**
@@ -87,14 +30,14 @@ def get_metric_info(metric):
             - Most business documents aim for 60-70
             - Popular novels typically score 70-80
             """,
-            'description': """
+            "description": """
             The Flesch Reading Ease Score is one of the oldest and most accurate readability formulas. 
             It considers both sentence length and word complexity (syllable count) to determine how difficult a text is to understand.
-            """
+            """,
         },
-        'smog_index': {
-            'formula': '1.0430 × √(number of polysyllables × (30/number of sentences)) + 3.1291',
-            'interpretation': """
+        "smog_index": {
+            "formula": "1.0430 × √(number of polysyllables × (30/number of sentences)) + 3.1291",
+            "interpretation": """
             ### SMOG Index
             
             **Score Interpretation:**
@@ -109,14 +52,14 @@ def get_metric_info(metric):
             - Considered highly accurate for health materials
             - Generally predicts 100% comprehension
             """,
-            'description': """
+            "description": """
             The SMOG (Simple Measure of Gobbledygook) Index estimates the years of education needed to understand a text. 
             It's particularly popular in healthcare and medical communication due to its accuracy in predicting comprehension.
-            """
+            """,
         },
-        'dale_chall_score': {
-            'formula': '0.1579 × (difficult words/words × 100) + 0.0496 × (words/sentences)',
-            'interpretation': """
+        "dale_chall_score": {
+            "formula": "0.1579 × (difficult words/words × 100) + 0.0496 × (words/sentences)",
+            "interpretation": """
             ### Dale-Chall Score
             
             **Score Interpretation:**
@@ -133,71 +76,200 @@ def get_metric_info(metric):
             - Counts "difficult" words not in this list
             - Highly respected in education
             """,
-            'description': """
+            "description": """
             The Dale-Chall Score is unique because it uses a predefined list of familiar words rather than syllable count. 
             Words not on this list are considered 'difficult,' making it particularly useful for educational content assessment.
-            """
-        }
+            """,
+        },
     }
     return info[metric]
+
+
+def prepare_distribution_data(data, metric):
+    """
+    Prepare data for distribution plots
+    """
+    fake_data = data[data["label_names"] == "fake"][metric]
+    real_data = data[data["label_names"] == "real"][metric]
+
+    x_range = np.linspace(
+        min(fake_data.min(), real_data.min()),
+        max(fake_data.max(), real_data.max()),
+        200,
+    )
+
+    fake_kde = gaussian_kde(fake_data)
+    real_kde = gaussian_kde(real_data)
+
+    return {
+        "x_range": x_range,
+        "fake_kde": fake_kde(x_range),
+        "real_kde": real_kde(x_range),
+        "fake_data": fake_data,
+        "real_data": real_data,
+    }
+
+
+@st.cache_data(show_spinner="Generating visualization...")
+def create_dynamic_distribution_plot(plot_data, metric, title):
+    """
+    Creates an interactive Plotly distribution plot
+    """
+    fig = go.Figure()
+
+    # Add traces for fake and real news
+    fig.add_trace(
+        go.Scatter(
+            x=plot_data["x_range"],
+            y=plot_data["fake_kde"],
+            name="Fake News",
+            fill="tozeroy",
+            fillcolor="rgba(255,107,107,0.2)",
+            line=dict(color="#FF6B6B", width=2),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=plot_data["x_range"],
+            y=plot_data["real_kde"],
+            name="Real News",
+            fill="tozeroy",
+            fillcolor="rgba(78,203,113,0.2)",
+            line=dict(color="#4ECB71", width=2),
+        )
+    )
+
+    fig.update_layout(
+        title=title,
+        xaxis_title=metric.replace("_", " ").title(),
+        yaxis_title="Density",
+        template="plotly_white",
+        height=500,
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+
+    return fig
+
+
+@st.cache_data(show_spinner="Generating visualization...")
+def create_static_distribution_plot(plot_data, metric, title):
+    """
+    Creates a static Matplotlib distribution plot
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Plot distributions
+    ax.fill_between(
+        plot_data["x_range"],
+        plot_data["fake_kde"],
+        alpha=0.2,
+        color="#FF6B6B",
+        label="Fake News",
+    )
+    ax.plot(plot_data["x_range"], plot_data["fake_kde"], color="#FF6B6B", linewidth=2)
+
+    ax.fill_between(
+        plot_data["x_range"],
+        plot_data["real_kde"],
+        alpha=0.2,
+        color="#4ECB71",
+        label="Real News",
+    )
+    ax.plot(plot_data["x_range"], plot_data["real_kde"], color="#4ECB71", linewidth=2)
+
+    # Customize plot
+    ax.set_title(title, pad=20, fontsize=14, fontweight="bold")
+    ax.set_xlabel(metric.replace("_", " ").title(), fontsize=12)
+    ax.set_ylabel("Density", fontsize=12)
+
+    # Add grid and remove top/right spines
+    ax.grid(True, linestyle="--", alpha=0.7)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    # Add legend
+    ax.legend(loc="upper right")
+
+    plt.tight_layout()
+    return fig
+
 
 def readability_scores_component(df):
     """
     Component for analyzing readability metrics
     """
     st.header("Readability Metrics Analysis")
-    
+
     metrics = {
-        'flesch_reading_ease': 'Flesch Reading Ease',
-        'smog_index': 'SMOG Index',
-        'dale_chall_score': 'Dale-Chall Score'
+        "flesch_reading_ease": "Flesch Reading Ease",
+        "smog_index": "SMOG Index",
+        "dale_chall_score": "Dale-Chall Score",
     }
-    
+
     # Create tabs
     tabs = st.tabs(list(metrics.values()))
-    
+
     for tab, (metric, title) in zip(tabs, metrics.items()):
         with tab:
-            # Create distribution plot
-            fig = create_distribution_plot(df, metric, f"{title} Distribution")
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Get metric information
+            # Prepare plot data
+            plot_data = prepare_distribution_data(df, metric)
+
+            # Create and display plot based on selected type
+            if st.session_state.use_static_plots:
+                fig = create_static_distribution_plot(
+                    plot_data, metric, f"{title} Distribution"
+                )
+                st.pyplot(fig)
+                plt.close(fig)
+            else:
+                fig = create_dynamic_distribution_plot(
+                    plot_data, metric, f"{title} Distribution"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            # Display statistics and interpretation (rest remains the same)
             metric_info = get_metric_info(metric)
-            
+
             col_stats, col_interp = st.columns(2)
             with col_stats:
                 with st.expander("📊 Statistical Summary"):
                     col1, col2 = st.columns(2)
-                    
+
                     with col1:
                         st.subheader("Fake News")
-                        fake_stats = df[df['label_names'] == 'fake'][metric].describe().round(2)
+                        fake_stats = (
+                            df[df["label_names"] == "fake"][metric].describe().round(2)
+                        )
                         st.dataframe(pd.DataFrame(fake_stats))
-                    
+
                     with col2:
                         st.subheader("Real News")
-                        real_stats = df[df['label_names'] == 'real'][metric].describe().round(2)
+                        real_stats = (
+                            df[df["label_names"] == "real"][metric].describe().round(2)
+                        )
                         st.dataframe(pd.DataFrame(real_stats))
-            
+
             with col_interp:
                 with st.expander("ℹ️ Understanding the Metric"):
-                    st.markdown(metric_info['description'])
-                    
+                    st.markdown(metric_info["description"])
+
                     st.subheader("Formula")
-                    st.code(metric_info['formula'])
-                    
-                    st.markdown(metric_info['interpretation'])
-                    
-                    # Add comparison between fake and real news
-                    fake_mean = df[df['label_names'] == 'fake'][metric].mean()
-                    real_mean = df[df['label_names'] == 'real'][metric].mean()
+                    st.code(metric_info["formula"])
+
+                    st.markdown(metric_info["interpretation"])
+
+                    fake_mean = df[df["label_names"] == "fake"][metric].mean()
+                    real_mean = df[df["label_names"] == "real"][metric].mean()
                     diff = abs(fake_mean - real_mean)
-                    
+
                     st.subheader("Fake vs. Real News Analysis")
-                    st.markdown(f"""
+                    st.markdown(
+                        f"""
                     **Average Scores:**
                     - Fake News: {fake_mean:.2f}
                     - Real News: {real_mean:.2f}
                     - Difference: {diff:.2f}
-                    """)
+                    """
+                    )

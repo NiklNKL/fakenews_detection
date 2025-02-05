@@ -11,16 +11,17 @@ from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from peft import PeftModel
+import yaml
 
-
-st.set_page_config(
-    layout="wide",
-    page_title="Fake News Detection",
-    page_icon="🤖"
-    )
+st.set_page_config(layout="wide", page_title="Fake News Detection", page_icon="🤖")
 
 root_path = Path(__file__).resolve().parent.parent.parent
 model_folder = f"{root_path}/models"
+if "use_static_plots" not in st.session_state:
+    with open(f"{root_path}/streamlit_app/streamlit_config.yaml", "r") as file:
+        data = yaml.safe_load(file)
+        st.session_state.use_static_plots = data["use_static_plots"]
+
 
 @st.cache_resource
 def load_model(model_name):
@@ -36,18 +37,19 @@ def load_model(model_name):
         model.eval()  # Set to evaluation mode
 
         return model, tokenizer
-    
+
     st.error("Invalid model selection")
     return None, None
 
 
 # Load SpaCy for preprocessing
-nlp = spacy.load('en_core_web_sm', disable=['tagger', 'parser', 'ner'])
+nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
 stopwords = nlp.Defaults.stop_words
+
 
 def preprocess_text_with_tracking(text):
     """
-    Apply preprocessing steps including lowering case, removing URLs, punctuation, 
+    Apply preprocessing steps including lowering case, removing URLs, punctuation,
     stopwords, and lemmatization. Track changes made during preprocessing.
     """
     changes = []
@@ -61,8 +63,8 @@ def preprocess_text_with_tracking(text):
         changes.append("Converted text to lowercase")
 
     # Remove URLs
-    url_count = len(re.findall(r'http[\w:/\.]+', text))
-    text = re.sub(r'http[\w:/\.]+', ' ', text)
+    url_count = len(re.findall(r"http[\w:/\.]+", text))
+    text = re.sub(r"http[\w:/\.]+", " ", text)
     if url_count > 0:
         changes.append(f"Removed {url_count} URL(s)")
 
@@ -79,11 +81,14 @@ def preprocess_text_with_tracking(text):
         original_word_count = len(text_before_contractions.split())
         new_word_count = len(text.split())
         contractions_expanded = new_word_count - original_word_count
-        changes.append(f"Expanded {contractions_expanded} contraction" + ("s" if contractions_expanded > 1 else ""))
+        changes.append(
+            f"Expanded {contractions_expanded} contraction"
+            + ("s" if contractions_expanded > 1 else "")
+        )
 
     # Collapse multiple spaces
-    multiple_space_count = len(re.findall(r'\s\s+', text))
-    text = re.sub(r'\s\s+', ' ', text).strip()
+    multiple_space_count = len(re.findall(r"\s\s+", text))
+    text = re.sub(r"\s\s+", " ", text).strip()
     if multiple_space_count > 0:
         changes.append(f"Collapsed {multiple_space_count} multiple spaces")
 
@@ -97,11 +102,14 @@ def preprocess_text_with_tracking(text):
         else:
             stopword_count += 1
 
-    processed_text = ' '.join(lemmatized_tokens)
+    processed_text = " ".join(lemmatized_tokens)
     if stopword_count > 0:
-        changes.append(f"Removed {stopword_count} stopword" + ("s" if stopword_count > 1 else ""))
+        changes.append(
+            f"Removed {stopword_count} stopword" + ("s" if stopword_count > 1 else "")
+        )
 
     return processed_text, changes
+
 
 @st.cache_data
 def preprocess_text_with_tracking_cached(text):
@@ -111,7 +119,9 @@ def preprocess_text_with_tracking_cached(text):
 def get_prediction(model_tuple, processed_text):
     if isinstance(model_tuple, tuple):  # If it's a PEFT model
         model, tokenizer = model_tuple
-        inputs = tokenizer(processed_text, return_tensors="pt", truncation=True, padding=True)
+        inputs = tokenizer(
+            processed_text, return_tensors="pt", truncation=True, padding=True
+        )
 
         with torch.no_grad():
             outputs = model(**inputs)
@@ -143,12 +153,12 @@ with input_col:
         button_pressed = st.button("Analyze")
     with dropdown:
         st.write("Model in use: DistilBERT")
-        
+
 
 if button_pressed and user_input.strip():
     # Preprocess text and cache it for reuse
     preprocessed_text, changes = preprocess_text_with_tracking_cached(user_input)
-    
+
     # Dynamically load and process selected models
     model, tokenizer = load_model("DistilBERT")
 
@@ -160,26 +170,32 @@ if button_pressed and user_input.strip():
             st.subheader("Prediction Result")
 
             if prediction == 0:
-                st.success(f"✅ **This news is likely REAL. You should still verify the information however.**")
+                st.success(
+                    f"✅ **This news is likely REAL. You should still verify the information however.**"
+                )
             else:
-                st.error(f"🚨 **This could be FAKE NEWS! Please verify the information before sharing.**")
+                st.error(
+                    f"🚨 **This could be FAKE NEWS! Please verify the information before sharing.**"
+                )
 
             # Gauge Chart for Confidence Visualization
-            fig = go.Figure(go.Indicator(
-                mode="gauge+number",
-                value=confidence * 100,
-                number={'valueformat': ".2f", 'suffix': "%"},
-                title={'text': "Confidence Level"},
-                gauge={
-                    'axis': {'range': [0, 100]},
-                    'bar': {'color': "darkblue"},
-                    'steps': [
-                        {'range': [0, 33], 'color': "#FF6B6B"},   # Red
-                        {'range': [33, 66], 'color': "#FFD700"},  # Yellow
-                        {'range': [66, 100], 'color': "#4ECB71"}  # Green
-                    ],
-                }
-            ))
+            fig = go.Figure(
+                go.Indicator(
+                    mode="gauge+number",
+                    value=confidence * 100,
+                    number={"valueformat": ".2f", "suffix": "%"},
+                    title={"text": "Confidence Level"},
+                    gauge={
+                        "axis": {"range": [0, 100]},
+                        "bar": {"color": "darkblue"},
+                        "steps": [
+                            {"range": [0, 33], "color": "#FF6B6B"},  # Red
+                            {"range": [33, 66], "color": "#FFD700"},  # Yellow
+                            {"range": [66, 100], "color": "#4ECB71"},  # Green
+                        ],
+                    },
+                )
+            )
 
             st.plotly_chart(fig)
 
@@ -199,6 +215,6 @@ if button_pressed and user_input.strip():
                 st.write(f"{step}. {change}")
         else:
             st.write("No changes were made during preprocessing.")
-        
+
         with st.expander("Show Preprocessed Text"):
             st.write(preprocessed_text)

@@ -2,14 +2,15 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import psutil
 
+
 def fill_mask_component(pipeline):
-    
+
     def get_memory_usage():
         process = psutil.Process()
-        memory_info = process.memory_info() 
-        return round(memory_info.rss / 1024 / 1024, 2)  
-    
-    if 'masked_tokens' not in st.session_state:
+        memory_info = process.memory_info()
+        return round(memory_info.rss / 1024 / 1024, 2)
+
+    if "masked_tokens" not in st.session_state:
         st.session_state.masked_tokens = None
         st.session_state.masked_probs = None
         st.session_state.masked_last_input = None
@@ -24,48 +25,64 @@ def fill_mask_component(pipeline):
             st.error("Please include a [MASK] or ??? token in your input.")
             return None
         predictions = pipeline(masked_text_input)
-        
+
         # Extract tokens and probabilities from the pipeline output
         tokens = [pred["token_str"] for pred in predictions[:5]]
         token_probs = [pred["score"] for pred in predictions[:5]]
-        
+
         return tokens, token_probs
 
-            
-    
     col_1, col_2 = st.columns(2)
     with col_1:
-        masked_text_input = st.text_area("Enter a sentence and replace one word with [MASK] or ???:")
+        masked_text_input = st.text_area(
+            "Enter a sentence and replace one word with [MASK] or ???:"
+        )
         masked_button = st.button("Run Mask Prediction")
         if masked_text_input and masked_button:
             if masked_text_input == "show memory usage":
                 st.session_state.show_memory_button = True
-            if st.session_state.masked_last_input is None or masked_text_input != st.session_state.masked_last_input:
+            if masked_text_input == "switch static plots":
+                st.session_state.use_static_plots = (
+                    not st.session_state.use_static_plots
+                )
+            if (
+                st.session_state.masked_last_input is None
+                or masked_text_input != st.session_state.masked_last_input
+            ):
                 result = fill_mask_prediction(masked_text_input)
                 if result:
-                    st.session_state.masked_tokens, st.session_state.masked_probs = result
-            
+                    st.session_state.masked_tokens, st.session_state.masked_probs = (
+                        result
+                    )
+
     with col_2:
         if st.session_state.show_memory_button:
-            if st.sidebar.button('Refresh Memory Usage'):
+            if st.sidebar.button("Refresh Memory Usage"):
                 st.sidebar.write("Memory Usage (in MB):", get_memory_usage())
-            if st.sidebar.button('Hide Memory Usage'):
+            if st.sidebar.button("Hide Memory Usage"):
                 st.session_state.show_memory_button = False
         if st.session_state.masked_tokens is not None:
             # Visualization for masked LM
             fig, ax = plt.subplots(figsize=(8, 2))
-            ax.barh(st.session_state.masked_tokens, st.session_state.masked_probs, label="PyTorch-BERT", color="lightcoral", alpha=0.7)
+            ax.barh(
+                st.session_state.masked_tokens,
+                st.session_state.masked_probs,
+                label="PyTorch-BERT",
+                color="lightcoral",
+                alpha=0.7,
+            )
             ax.set_xlabel("Probability")
             ax.set_title("Top Predictions for Masked Token")
             ax.invert_yaxis()
             plt.legend()
             plt.tight_layout()
             st.pyplot(fig)
-            
-    col_1, col_2 = st.columns(2)  
+
+    col_1, col_2 = st.columns(2)
     with col_1:
         with st.expander("ℹ️ What's happening here?"):
-            st.markdown("""
+            st.markdown(
+                """
                 - **Masked Language Modeling**: Predicts the masked word in a sentence.
                 - **How to use it**: Enter a sentence with one word replaced by [MASK] or ??? and click the "Run Mask Prediction" button.
                 - **Example**: "The capital of France is [MASK]." or "The capital of France is ???."
@@ -77,14 +94,16 @@ def fill_mask_component(pipeline):
                 - **Note**: The bar chart visualization shows the top predictions and their probabilities.
                 - **Model**: This component uses a pre-trained BERT model for masked language prediction. Link to this model can be found [here](https://huggingface.co/distilbert/distilbert-base-uncased).
                 - **Additional Info**: Masking tokens was a common technique used in BERT training to make it bidirectional instead of just left-to-right like most LLMs. You can read more about it [here](https://huggingface.co/blog/bert-101#22-what-is-a-masked-language-model).
-            """)
+            """
+            )
     with col_2:
         with st.expander("💻 Code for Component"):
             # Code snippet
             st.markdown("##### 🛠️ Installation Requirements:")
             st.code("""pip install torch transformers""")
             st.markdown("##### 🖨️ Code used in Component*:")
-            st.code("""
+            st.code(
+                """
             from transformers import AutoTokenizer, AutoModelForMaskedLM
             import torch
             
@@ -108,5 +127,6 @@ def fill_mask_component(pipeline):
                 token_probs = probs[indices].detach().numpy()  # Extract probabilities and detach to move out of the computation graph 
                 
                 return tokens, token_probs
-                """)
+                """
+            )
             st.write("*Code without Streamlit UI Components")

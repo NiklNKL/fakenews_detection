@@ -1,5 +1,6 @@
 import streamlit as st
 from pathlib import Path
+import yaml
 
 st.set_page_config(
     page_title="FHDW Student Project: Fake News Detection",
@@ -9,6 +10,12 @@ st.set_page_config(
 root_path = Path(__file__).resolve().parent
 
 st.image(f"{root_path}/assets/FHDW_Logo.jpg")
+
+if "use_static_plots" not in st.session_state:
+    with open(f"{root_path}/streamlit_config.yaml", "r") as file:
+        data = yaml.safe_load(file)
+        st.session_state.use_static_plots = data["use_static_plots"]
+
 st.write("## Welcome to the FHDW Student Project:")
 st.write("# Fake News Detection")
 
